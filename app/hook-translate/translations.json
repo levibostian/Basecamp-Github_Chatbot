@@ -1,0 +1,89 @@
+{
+    "deployment": {
+        "templates": {
+            "user_link": "<a href='<%= deployment.creator.html_url %>'>@<%= deployment.creator.login %></a>",
+            "repository_link": "<a href='<%= respository.html_url %>'><%= repository.full_name %></a>"
+        },
+        "actions": {
+            "default": "<%- user_link %> created a deployment for <%- repository_link %>"
+        }
+    },
+    "issues": {
+        "templates": {
+            "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
+            "issue_link": "issue <a href='<%= issue.html_url %>'><%= issue.title %></a>"
+        },
+        "actions": {
+            "deleted": "<%- user_link %> deleted issue <%= issue.title %>",
+            "transferred": "<%- user_link %> transferred <%- issue_link %> to <a href='<%= respository.html_url %>'><%= repository.full_name %></a>",
+            "assigned": "<%- user_link %> assigned <%- issue_link %> to <a href='<%= assignee.html_url %>>@<%= assignee.login %></a>",
+            "unassigned": "<%- user_link %> unassigned <%- issue_link %> from <a href='<%= assignee.html_url %>>@<%= assignee.login %></a>",
+            "labeled": "<%- user_link %> labeled <%- issue_link %> as <pre><%= label.name %></pre>",
+            "unlabeled": "<%- user_link %> removed label <pre><%= label.name %></pre> from <%- issue_link %>",
+            "milestoned": "<%- user_link %> <a href='<%= milestone.html_url %>'>milestoned</a> <%- issue_link %>",
+            "default": "<%- user_link %> <%= action %> <%- issue_link %>"
+        }
+    },
+    "issue_comment": {
+        "templates": {
+            "user_link": "<a href='<%= sender.html_url>@<%= sender.login %></a>",
+            "issue_link": "issue <a href='<%= issue.html_url %>'><%= issue.title %></a>",
+            "comment_link": "<a href='<%= comment.html_url %>'>comment</a>"
+        },
+        "actions": {
+            "created": "<%- user_link %> added <%- comment_link %> to <%- issue_link %>",
+            "edited": "<%- user_link %> edited <%- comment_link %> on <%- issue_link %>",
+            "deleted": "<%- user_link %> deleted comment by <a href='<%= comment.user.html_url %>'>@<%= comment.user.login %></a> on <%- issue_link %>"
+        }
+    },
+    "pull_request": {
+        "templates": {
+            "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
+            "pull_request_link": "pull request <a href='<%= pull_request.html_url %>'><%= pull_request.title</a>"
+        },
+        "actions": {
+            "assigned": "<a href='<%= pull_request.assignee.html_url %>'>@<%= pull_request.assignee.login %></a> was assigned to <%- pull_request_link %> by <%- user_link %>",
+            "unassigned": "<a href='<%= pull_request.assignee.html_url %>'>@<%= pull_request.assignee.login %></a> was unassigned from <%- pull_request_link %> by <%- user_link %>",
+            "review_requested": "<%- user_link %> requested review from <% requested_reviewers.forEach(r => { %><a href='<%= html_url %>'>@<%= login %></a>, <% }); %>on <%- pull_request_link %>",
+            "review_request_removed": "<%- user_link %> removed review requests to <% requested_reviewers.forEach(r => { %><a href='<%= html_url %>'>@<%= login %></a>, <% }); %>on <%- pull_request_link %>",
+            "labeled": "<%- user_link %> labeled <%- pull_request_link %> as <pre><%= label.name %></pre>",
+            "unlabeled": "<%- user_link %> removed label <pre><%= label.name %></pre> from <%- pull_request_link %>",
+            "closed": "<%- user_link %> closed <% if(pull_request.merged) { %>and merged<% } else { %>without merging<% } %> <%- pull_request_link %>",
+            "ready_for_review": "<%= user_link %> marked <%= pull_request_link %> ready for review",
+            "default": "<%= user_link %> <%= action %> <%= pull_request_link %>"
+        }
+    },
+    "pull_request_review": {
+        "templates": {
+            "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
+            "pull_request_link": "pull request <a href='<%= pull_request.html_url %>'><%= pull_request.title</a>",
+            "review_link": "<a href='<%= review.html_url %>'>review</a>"
+        },
+        "actions": {
+            "submitted": "<%- user_link %> submitted a <%- review_link %> of <%- pull_request_link %>",
+            "edited": "<%- user_link %> edited a <%- review_link %> of <%- pull_request_link %>",
+            "dismissed": "<%- user_link %> dismissed a <%- review_link %> of <%- pull_request_link %>"
+        }
+   },
+    "release": {
+        "templates": {
+            "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
+            "release_link": "release <a href='<%= release.html_url %>'><%= release.tag_name %></a>"
+        },
+        "actions": {
+            "deleted": "<%- user_link %> deleted release <%= release.tag_name %>",
+            "default": "<%- user_link %> <%= action %> <%- release_link %>"
+        }
+    },
+    "repository": {
+        "templates": {
+            "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
+            "repository_link": "<a href='<%= respository.html_url %>'><%= repository.full_name %></a>"
+        },
+        "actions": {
+            "publicized": "<%- user_link %> made <%- repository_link %> public",
+            "privatized": "<%- user_link %> made <%- repository_link %> private",
+            "default": ""
+        }
+    }
+}

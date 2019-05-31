@@ -1,0 +1,45 @@
+{
+  "name": "basecamp-github-chatbot",
+  "version": "0.1.0",
+  "description": "A more advanced Basecamp chatbot to integrate GitHub and Basecamp",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "run": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foundersclubsoftware/Basecamp-Github_Chatbot.git"
+  },
+  "keywords": [
+    "basecamp",
+    "github",
+    "chat",
+    "bot",
+    "chatbot"
+  ],
+  "author": "thrymgjol",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/foundersclubsoftware/Basecamp-Github_Chatbot/issues"
+  },
+  "homepage": "https://github.com/foundersclubsoftware/Basecamp-Github_Chatbot#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "dotenv": "^8.0.0",
+    "ejs": "^2.6.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/ejs": "^2.6.3",
+    "@types/express": "^4.16.1",
+    "@types/yargs": "^13.0.0",
+    "nodemon": "^1.19.1",
+    "ts-node": "^8.2.0",
+    "tsconfig-paths": "^3.8.0",
+    "typescript": "^3.5.1",
+    "yargs": "^13.2.4"
+  }
+}
