@@ -1,16 +1,21 @@
-# Basecamp-Github_Chatbot
+# Basecamp + Github Chatbot
 A more advanced Basecamp chatbot to integrate GitHub and Basecamp
 
 ## Setup
-1. Create personal GitHub access token [here](https://github.com/settings/tokens/new) with orginization hooks and repo permissions
+1. Configure Github
+    1. Generate a 20 character hex key and set `hmac_secret` in `config.json` to the value you generated.
+    2. In your GitHub organization, go to <kbd>Settings</kbd>&rarr;<kbd>Webhooks</kbd>&rarr;<kbd>Add webhook</kbd>
+    3. Set the following values:
+        - Payload URL - `<your-server>/hook`
+        - Content type - `application/json`
+        - Secret - the value you generated
+    4. Select the events you would like to receive, then click <kbd>Add webhook</kbd>
 
-2. Set environment variables in .env (based on .env.example) and deploy (currently using ngrok). Currently typescript is not compiling correctly but `npx nodemon` works fine.
+2. Configure Basecamp
+    1. Generate a random access key and set `access_key` in `config.json` to the value you generated
+    2. In any bucket in Basecamp, click the ellipsis in the upper right corner and select <kbd>Configure chatbots</kbd>&rarr;<kbd>Add new chatbot</kbd>
+    3. Set the name field to whatever you wish to address the bot as
+    4. Set the Command URL field to `<your-server>/command?access_key=<your-access-key>`
+    5. Add the bot
 
-3. Create Chatbot on Basecamp bucket
-    - ... > Configure chatbots > Add a new chatbot
-    - Command URL: \<server-url>/command
-
-4. Run !\<bot-name> help in any chat to get started
-
-## Note
-This came together pretty fast but is still very rough and has many bugs. This is far from complete. A fully automated solution may involve a GitHub App along with a Basecamp integration.
+1. Run `npm run build` then `npm run production` on a public-facing server.

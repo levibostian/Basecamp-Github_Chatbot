@@ -1,14 +1,24 @@
 import { NextFunction, Request, Response } from 'express'
 
 import parse from '@app/command'
+import config from '@app/config'
+import logger from '@app/logger'
 
 export default function command(req: Request, res: Response, next: NextFunction): void {
-    // TODO: verify origin of request
+    res.status(204).send()
+
+    // Don't handle requests where the access key doesn't match
+    if (req.params.access_key !== config.access_key) {
+        logger.log(
+            config.logging.tags.security,
+            'Attempted access to /command with invalid access key: ' + req.connection.remoteAddress
+        )
+        return next()
+    }
 
     if ('command' in req.body && 'callback_url' in req.body) {
         parse(req.body)
     }
 
-    res.status(204).send()
     next()
 }

@@ -1,12 +1,14 @@
 import express from 'express'
 
 import command from './command'
-import hook from './hook'
+import hook, { verifyHmac } from './hook'
 
 const server = express()
 
-server.use(express.json())
-server.post('/hook', hook)
-server.post('/command', command)
+server.post('/hook', express.json({
+    verify: verifyHmac
+}), hook)
+
+server.post('/command', express.json(), command)
 
 export default server

@@ -1,16 +1,12 @@
-import message from '../message'
+import chat from '@app/chat'
+import config from '@app/config'
 
 const command = 'help'
-const describe = 'get help'
+const describe = ''
 const builder = {}
 
-const help_message = '<strong>Available Commands</strong>'
-    + '<ul><li>register &lt;owner&gt;/&lt;repo&gt;</li>'
-    + '<li>deregister &lt;owner&gt;/&lt;repo&gt;</li>'
-    + '<li>list</li></ul>'
-
 function handler(argv: any): void {
-    message(argv.respond_url, help_message)
+    chat(argv.lines_url, config.messages.help)
 }
 
 export default { command, describe, builder, handler }

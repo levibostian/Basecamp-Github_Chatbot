@@ -1,4 +1,3 @@
 node_modules
-PLAN
-.env
 dist
+data

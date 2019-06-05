@@ -1,22 +1,19 @@
 import ejs from 'ejs'
 
-import database from '@app/database'
-
-import message from '../message'
+import chat from '@app/chat'
+import config from '@app/config'
+import db from '@app/database'
 
 const command = 'list'
-const describe = 'list repos'
+const describe = ''
 const builder = {}
 
-const subscriptions_template = '<strong>Currently subscribed to</strong>'
-    + '<ul><% subscriptions.forEach(s => { %><li><%= s %></li><% }); %></ul>'
-
 function handler(argv: any): void {
-    const subscriptions = database.getSubscriptions(argv.respond_url)
+    const subscriptions = db.getRepositories(argv.lines_url)
     if (subscriptions.length) {
-        message(argv.respond_url, ejs.render(subscriptions_template, { subscriptions }))
+        chat(argv.lines_url, ejs.render(config.messages.list, { subscriptions }))
     } else {
-        message(argv.respond_url, 'This chat is not subscribed to any repositories.')
+        chat(argv.lines_url, config.messages.list_empty)
     }
 }
 

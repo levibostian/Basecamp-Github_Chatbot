@@ -10,7 +10,8 @@
         "baseUrl": ".",
         "paths": {
             "*": [ "node_modules/*" ],
-            "@app/*": [ "app/*" ]
+            "@app/*": [ "app/*" ],
+            "@config/*": [ "config/*" ]
         }
     },
     "include": [

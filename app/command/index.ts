@@ -1,5 +1,7 @@
 import yargs from 'yargs'
 
+import { chatError } from '@app/chat'
+
 import commands from './modules'
 
 export default async function parse(payload: any): Promise<void> {
@@ -9,19 +11,19 @@ export default async function parse(payload: any): Promise<void> {
     const parser = yargs
         .command(commands.fail)
         .command(commands.help)
-        .command(commands.register)
-        .command(commands.deregister)
+        .command(commands.subscribe)
+        .command(commands.unsubscribe)
         .command(commands.list)
         .fail((msg, err) => {
-            commands.fail.send_error(payload.callback_url, payload.creator)
+            chatError(payload.callback_url, payload.creator)
             throw err
         })
         .help(false)
 
     try {
-        parser.parse(args, {
+        const argv = parser.parse(args, {
             creator: payload.creator,
-            respond_url: payload.callback_url
+            lines_url: payload.callback_url
         })
     } catch {
         // whoops

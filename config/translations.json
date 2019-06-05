@@ -26,7 +26,7 @@
     },
     "issue_comment": {
         "templates": {
-            "user_link": "<a href='<%= sender.html_url>@<%= sender.login %></a>",
+            "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
             "issue_link": "issue <a href='<%= issue.html_url %>'><%= issue.title %></a>",
             "comment_link": "<a href='<%= comment.html_url %>'>comment</a>"
         },
@@ -78,7 +78,7 @@
     "repository": {
         "templates": {
             "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
-            "repository_link": "<a href='<%= respository.html_url %>'><%= repository.full_name %></a>"
+            "repository_link": "<a href='<%= repository.html_url %>'><%= repository.full_name %></a>"
         },
         "actions": {
             "publicized": "<%- user_link %> made <%- repository_link %> public",

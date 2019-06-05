@@ -1,13 +1,13 @@
-import deregister from './deregister'
 import help from './help'
 import fail from './fail'
 import list from './list'
-import register from './register'
+import subscribe from './subscribe'
+import unsubscribe from './unsubscribe'
 
 export default {
-    deregister,
     help,
     fail,
     list,
-    register
+    subscribe,
+    unsubscribe
 }

@@ -1,6 +1,8 @@
 import ejs from 'ejs'
 
-import translationData from '@app/hook-translate/translations.json'
+import config from '@app/config'
+import logger from '@app/logger'
+import translationData from '@config/translations.json'
 
 let translations = translationData as {
     [key: string]: {
@@ -27,6 +29,18 @@ export default function translate(event: string, payload: any): string | undefin
         action = payload.action
     }
     
-    let template: string = translation.actions[action]
-    return template ? ejs.render(translation.actions[action], payload) : undefined
+    const template: string = translation.actions[action]
+    let result: string | undefined = undefined
+    try {
+        if (template) {
+            result = ejs.render(template, payload)
+        }
+    } catch (err) {
+        logger.log(
+            config.logging.tags.error,
+            'template rendering failed: ' + err.message + '\n' + err.stack
+        )
+    }
+
+    return result
 }
