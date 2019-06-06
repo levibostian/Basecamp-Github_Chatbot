@@ -18,11 +18,16 @@ A more advanced Basecamp chatbot to integrate GitHub and Basecamp
     2. In any bucket in Basecamp, click the ellipsis in the upper right corner and select <kbd>Configure chatbots</kbd>&rarr;<kbd>Add new chatbot</kbd>
     3. Set the name field to whatever you wish to address the bot as
     4. Set the Command URL field to `<your-server>/command?access_key=<your-access-key>`
-    5. *(Optional)* Set the avatar to the icon included in this repository
+    5. *(Optional)* Set the avatar to [the icon](/avatar.png) included in this repository
     6. Add the bot
 ![Basecamp Setup](https://i.imgur.com/x7wK8yJ.png)
 
 3. Run `npm run build` then `npm run production` on a public-facing server.
+
+## Interaction
+![Interaction Example](https://i.imgur.com/SCfOGzw.png)
+
+Interact with the bot by chatting `!<bot-name> <command>` in any campfire. When subscribing or unsubcribing, omit the organization prefix (e.g. `repo` instead of `myorg/repo`).
 
 ## Adding events
 
