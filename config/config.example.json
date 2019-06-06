@@ -1,10 +1,8 @@
 {
     "development": {
-        "basecamp": {
-            "user_agent": "BaseCamp + GitHub ChatBot (thrymgjol@gmail.com)"
-        },
+        "basecamp_user_agent": "Basecamp + GitHub Chatbot (example@example.com)",
         "database": {
-            "store_file": "data/database.json",
+            "file": "data/database.json",
             "encoding": "utf8"
         },
         "logging": {
@@ -16,8 +14,8 @@
             }
         },
         "messages": {
-            "help": "<strong>Available Commands</strong><ul><li>subscripe &lt;repo&gt;</li><li>unsubscribe &lt;repo&gt;</li><li>list</li></ul>",
-            "list": "<strong>Currently subscribed to</strong><ul><% subscriptions.forEach(s => { %><li><%= s %></li><% }); %></ul>",
+            "help": "available commands are:<ul><li>subscribe &lt;repo&gt;</li><li>unsubscribe &lt;repo&gt;</li><li>list</li></ul>",
+            "list_repos": "<strong>Currently subscribed to</strong><ul><% subscriptions.forEach(s => { %><li><%= s %></li><% }); %></ul>",
             "list_empty": "This chat is not subscribed to any repositories.",
             "subscribe": "Successfully subscribed to notifications for <%= repo %>.",
             "unrecognized": "I didn't catch that. Try the <strong>help</strong> command to learn how to use me!",

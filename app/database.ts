@@ -1,105 +1,108 @@
-import fs from 'fs'
+import fs from "fs"
 
-import config from '@app/config'
+import config from "@app/config"
+import logger from "./logger"
 
 type Subscription = {
-    lines_url: string
-    repositories: string[]
+  chat_url: string
+  repositories: string[]
 }
 
-class SubscriberStore {
-    private subscribers: Subscription[]
+class SubscriptionStore {
+  private subscriptions: Subscription[]
 
-    public constructor() {
-        this.subscribers = this.read()
-    }
+  public constructor() {
+    this.subscriptions = this.readFile()
+  }
 
-    /* Write data to filesystem */
-    private save(): void {
-        try {
-            let data = JSON.stringify(this.subscribers)
-            fs.writeFileSync(config.database.store_file, data, config.database.encoding)
-        } catch (err) {
-            throw err
+  private saveFile(): void {
+    fs.promises
+      .writeFile(
+        config.database.file,
+        JSON.stringify(this.subscriptions),
+        config.database.encoding
+      )
+      .catch(err => {
+        if (err) {
+          logger.log(
+            config.logging.tags.error,
+            `unable to save database, error writing to ${config.database.file}`
+          )
         }
+      })
+  }
+
+  private readFile(): Subscription[] {
+    // Empty/new database
+    if (!fs.existsSync(config.database.file)) {
+      return []
     }
 
-    /* Read data from filesystem */
-    private read(): Subscription[]  {
-        try {
-            const data = fs.readFileSync(config.database.store_file, config.database.encoding)
-            return JSON.parse(data) 
-        } catch (err) {
-            // File not found
-            if (err.code === 'ENOENT') {
-                return []
-            }
+    return JSON.parse(
+      fs.readFileSync(config.database.file, config.database.encoding)
+    )
+  }
 
-            throw err
-        }
+  /* Get a subscription from a chat callback URL */
+  private getSubscription(chatUrl: string): Subscription | undefined {
+    return this.subscriptions.find(s => s.chat_url === chatUrl)
+  }
+
+  /* Get a list of repositories a chat is subscribed to */
+  public getRepositories(lines_url: string): string[] {
+    const subscription = this.getSubscription(lines_url)
+
+    return subscription ? subscription.repositories : []
+  }
+
+  /* Change the name of a repository */
+  public renameRepository(from: string, to: string): void {
+    this.subscriptions.forEach(s => {
+      const index = s.repositories.indexOf(from)
+      if (index >= 0) {
+        s.repositories[index] = to
+      }
+    })
+
+    this.saveFile()
+  }
+
+  /* Return chat callback URLs for all chats subscribed to given repo */
+  public getSubscribers(repo: string): string[] {
+    return this.subscriptions
+      .filter(s => s.repositories.includes(repo))
+      .map(s => s.chat_url)
+  }
+
+  /* Add a repo to a chat's subscriptions */
+  public addSubscription(repo: string, lines_url: string): void {
+    const subscription = this.getSubscription(lines_url)
+
+    if (subscription && !subscription.repositories.includes(repo)) {
+      subscription.repositories.push(repo)
+    } else {
+      this.subscriptions.push({
+        chat_url: lines_url,
+        repositories: [repo],
+      })
     }
 
-    /* Get a subscription from a chat callback URL */
-    private getSubscription(lines_url: string): Subscription | undefined {
-        return this.subscribers
-            .find(s => s.lines_url === lines_url)
+    this.saveFile()
+  }
+
+  public removeSubscription(repo: string, lines_url: string): void {
+    const subscription = this.getSubscription(lines_url)
+
+    if (subscription) {
+      subscription.repositories = subscription.repositories.filter(
+        r => r !== repo
+      )
     }
 
-    /* Get a list of repositories a chat is subscribed to */
-    public getRepositories(lines_url: string): string[] {
-        const subscription = this.getSubscription(lines_url)
-
-        return subscription ? subscription.repositories : []
-    }
-
-    /* Change the name of a repository */
-    public renameRepository(from: string, to: string): void {
-        this.subscribers.forEach(s => {
-            const index = s.repositories.indexOf(from)
-            if (index >= 0) {
-                s.repositories[index] = to
-            }
-        })
-
-        this.save()
-    }
-
-    /* Return chat callback URLs for all chats subscribed to given repo */
-    public getSubscribers(repo: string): string[] {
-        return this.subscribers
-            .filter(s => s.repositories.includes(repo))
-            .map(s => s.lines_url)
-    }
-
-    /* Add a repo to a chat's subscriptions */
-    public addSubscriber(repo: string, lines_url: string): void {
-        const subscription = this.getSubscription(lines_url)
-
-        if (subscription && !subscription.repositories.includes(repo)) {
-            subscription.repositories.push(repo)
-        } else {
-            this.subscribers.push({
-                lines_url,
-                repositories: [ repo ]
-            })
-        }
-
-        this.save()
-    }
-
-    /* Remove a repo from a chat's subscriptions */
-    public removeSubscriber(repo: string, lines_url: string): void {
-        const subscription = this.getSubscription(lines_url)
-
-        if (subscription) {
-            subscription.repositories = subscription.repositories
-                .filter(r => r !== repo)
-        }
-
-        this.save()
-    }
+    this.saveFile()
+  }
 }
 
 // Single instance
-const database = new SubscriberStore()
+const database = new SubscriptionStore()
 export default database

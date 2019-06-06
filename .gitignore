@@ -1,3 +1,5 @@
-node_modules
+.npm
+.config
 dist
-data
+node_modules
+

@@ -1,14 +1,18 @@
-import express from 'express'
+import express from "express"
 
-import command from './command'
-import hook, { verifyHmac } from './hook'
+import { ChatCommand } from "./command"
+import { GithubWebhook, VerifyGithubHMAC } from "./hook"
 
 const server = express()
 
-server.post('/hook', express.json({
-    verify: verifyHmac
-}), hook)
+server.post(
+  "/hook",
+  express.json({
+    verify: VerifyGithubHMAC,
+  }),
+  GithubWebhook
+)
 
-server.post('/command', express.json(), command)
+server.post("/command", express.json(), ChatCommand)
 
 export default server
