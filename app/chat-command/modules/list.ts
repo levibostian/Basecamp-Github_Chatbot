@@ -11,11 +11,11 @@ export const describe = ""
 export const builder = {}
 
 export function handler(args: ChatCommandArguments): void {
-  const subscriptions = db.getRepositories(args.responseUrl)
-  if (subscriptions.length) {
+  const repositories = db.getRepositoriesByChat(args.responseUrl)
+  if (repositories.length) {
     SendBasecampChat(
       args.responseUrl,
-      ejs.render(config.messages.list_repos, { subscriptions })
+      ejs.render(config.messages.list_repos, { repositories })
     )
   } else {
     SendBasecampChat(args.responseUrl, config.messages.list_empty)

@@ -25,7 +25,7 @@ export function SendBasecampChat(
     .catch(err => {
       logger.log(
         config.logging.tags.error,
-        "Failed to POST " + message + " to " + chatUrl
+        `Failed to POST ${message} to ${chatUrl}\n${err}\n${err.stack}`
       )
     })
 }

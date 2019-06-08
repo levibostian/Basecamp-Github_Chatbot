@@ -6,7 +6,7 @@ import db from "@app/database"
 import logger from "@app/logger"
 
 import { SendBasecampChat } from "@app/basecamp-chat"
-import { TranslateGithubPayload, PayloadTranslationError } from "@app/translate"
+import { GithubPayload, TranslateGithubPayload } from "@app/github-webhook"
 
 /* Add the hmac_verified property to Request objects */
 declare global {
@@ -17,28 +17,33 @@ declare global {
   }
 }
 
-function dispatchMessages(event: string, payload: any): void {
+function dispatchMessages(event: string, payload: GithubPayload): void {
   const repo = (payload.repository || {}).name
   if (!repo) {
     return
   }
 
-  // Change repo name in database if renamed on Github
-  if (event === "repository" && payload.action === "renamed") {
-    db.renameRepository(payload.changes.repository.name.from, repo)
+  if (event === "repository") {
+    switch (payload.action) {
+      // Change repo name in database if renamed on Github
+      case "renamed":
+        db.renameRepository(payload.changes.repository.name.from, repo)
+        break
+      // Remove repo name from database if deleted on GitHub
+      case "deleted":
+        db.deleteRepository(repo)
+        break
+    }
   }
 
-  TranslateGithubPayload(event, payload)
-    .then(content => {
-      db.getSubscribers(repo).forEach(lines_url =>
-        SendBasecampChat(lines_url, content)
-      )
-    })
-    .catch(err => {
-      if (!(err instanceof PayloadTranslationError)) {
-        throw err
-      }
-    })
+  if (!config.handled_events.includes(event)) {
+    return
+  }
+
+  const message = TranslateGithubPayload(event, payload)
+  db.getChatsByRepository(repo).forEach(chatUrl => {
+    SendBasecampChat(chatUrl, message)
+  })
 }
 
 export function VerifyGithubHMAC(
@@ -82,7 +87,8 @@ export function GithubWebhook(
   if (!event) {
     logger.log(
       config.logging.tags.error,
-      "Event header missing from request to /hook"
+      "Event header missing from request to /hook: " +
+        req.connection.remoteAddress
     )
     return next()
   }

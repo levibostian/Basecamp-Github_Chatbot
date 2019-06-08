@@ -11,10 +11,10 @@ export const describe = ""
 export const builder = {}
 
 export function handler(args: ChatCommandArguments): void {
-  const repos = db.getRepositories(args.responseUrl)
+  const repositories = db.getRepositoriesByChat(args.responseUrl)
 
-  if (repos.includes(args.repo)) {
-    db.removeSubscription(args.repo, args.responseUrl)
+  if (repositories.includes(args.repo)) {
+    db.removeRepositoryFromChat(args.repo, args.responseUrl)
     SendBasecampChat(
       args.responseUrl,
       ejs.render(config.messages.unsubscribe, { repo: args.repo })

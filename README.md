@@ -49,4 +49,8 @@ Translation entries are of the form
 ```
 where `event_name` is the GitHub webhook event name, and the keys of `actions` match the possible values of `action` in the webhook payload. The `default` value is used when a payload's action doesn't match any of the other keys. If the value of an action is an empty string, no message will be sent.
 
-The `templates` object defines snippets that can be reused in the messages for each action, as seen above. Both templates and actions use [ejs](https://ejs.co/) to render each message. The entire webhook payload object is available for use in your templates.
+The `templates` object defines snippets that can be reused in the messages for each action, as seen above. Both templates and actions use [ejs](https://ejs.co/) to render each message. The entire webhook payload object is available for use in your templates. Examples of payload objects for each event type are available [here](https://developer.github.com/v3/activity/events/types/).
+
+## Development
+
+Non-fatal errors and security exceptions (such as invalid access key) are logged to the file in `config.logging.file` when `config.logging.enabled` is `true`.

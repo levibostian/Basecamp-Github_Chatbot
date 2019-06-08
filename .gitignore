@@ -1,5 +1,8 @@
 .npm
 .config
+logfile
+database.json
+error.log
 dist
 node_modules
 config/config.json

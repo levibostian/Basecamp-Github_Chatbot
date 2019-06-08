@@ -8,6 +8,7 @@
     "local:run": "NODE_ENV=development node dist/index.js",
     "docker:build": "docker-compose -f docker/docker-compose.dev.yml build",
     "docker:run": "docker-compose -f docker/docker-compose.dev.yml up",
+    "production:run": "NODE_ENV=production forever -ae error.log dist/index.js",
     "format": "prettier --write \"app/**/*.ts\""
   },
   "repository": {
@@ -30,7 +31,8 @@
   "dependencies": {
     "axios": "^0.19.0",
     "ejs": "^2.6.1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "forever": "^1.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -53,7 +55,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "prettier --write",
+      "npm run format",
       "git add"
     ]
   }

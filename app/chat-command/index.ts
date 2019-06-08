@@ -4,6 +4,14 @@ import { SendBasecampDefaultError } from "@app/basecamp-chat"
 
 import * as commands from "./modules"
 
+type BasecampCommandPayload = {
+  command: string
+  creator: {
+    attachable_sgid: string
+  }
+  callback_url: string
+}
+
 export type ChatCommandArguments = {
   userId: string
   responseUrl: string
@@ -18,7 +26,9 @@ const ChatCommandParser = yargs
   .command(commands.list)
   .help(false)
 
-export async function ParseBasecampPayload(payload: any): Promise<void> {
+export async function ParseBasecampPayload(
+  payload: BasecampCommandPayload
+): Promise<void> {
   const command: string = payload.command
   const userId: string = (payload.creator || {}).attachable_sgid
   const responseUrl: string = payload.callback_url

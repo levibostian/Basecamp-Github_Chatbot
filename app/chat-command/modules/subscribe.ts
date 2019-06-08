@@ -11,7 +11,7 @@ export const describe = ""
 export const builder = {}
 
 export function handler(args: ChatCommandArguments): void {
-  db.addSubscription(args.repo, args.responseUrl)
+  db.addRepositoryToChat(args.repo, args.responseUrl)
   SendBasecampChat(
     args.responseUrl,
     ejs.render(config.messages.subscribe, { repo: args.repo })
