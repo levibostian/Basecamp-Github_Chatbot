@@ -1,7 +1,6 @@
 import fs from "fs"
 
 import config from "@app/config"
-import logger from "@app/logger"
 
 type Chat = {
   chat_url: string
@@ -21,14 +20,11 @@ class ChatStore {
     fs.promises
       .writeFile(config.database_file, JSON.stringify(this.chats), ENCODING)
       .catch(err => {
-        if (err) {
-          logger.log(
-            config.logging.tags.error,
-            `unable to save database, error writing to ${
-              config.database_file
-            }\n${err}\n${err.stack}`
-          )
-        }
+        throw Error(
+          `unable to save database, error writing to ${
+            config.database_file
+          }\n${err}\n${err.stack}`
+        )
       })
   }
 

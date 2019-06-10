@@ -1,7 +1,5 @@
 import ejs from "ejs"
 
-import config from "@app/config"
-import logger from "@app/logger"
 import translationData from "@config/translations.json"
 
 const translations = translationData as {
@@ -27,9 +25,19 @@ export function TranslateGithubPayload(
   const translation = translations[event]
 
   if (!(event in translations)) {
-    logger.log(
-      config.logging.tags.error,
-      `could not find event "${event}" in translations.json`
+    throw Error(
+      `Could not find event "${event}" in translations.json. If you wish to avoid this error, modify your organization webhook settings or add support in translations.json`
+    )
+  }
+
+  let eventAction: string = "default"
+  if ("action" in payload && payload.action in translation.actions) {
+    eventAction = payload.action
+  }
+
+  if (!(eventAction in translation.actions)) {
+    throw Error(
+      `could not find template for action "${eventAction}" in event "${event}" in translations.json.`
     )
   }
 
@@ -38,18 +46,6 @@ export function TranslateGithubPayload(
   Object.entries(translation.templates).forEach(templateEntry => {
     templates[templateEntry[0]] = ejs.render(templateEntry[1], payload)
   })
-
-  let eventAction: string = "default"
-  if ("action" in payload && payload.action in translation.actions) {
-    eventAction = payload.action
-  }
-
-  if (!(eventAction in translation.actions)) {
-    logger.log(
-      config.logging.tags.error,
-      `could not find template for action "${eventAction}" in event "${event}" in translations.json`
-    )
-  }
 
   const template: string = translation.actions[eventAction]
   return ejs.render(template, { ...payload, ...templates })

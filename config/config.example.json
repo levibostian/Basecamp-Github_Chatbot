@@ -1,24 +1,7 @@
 {
-    "development": {
+    "production": {
         "basecamp_user_agent": "Basecamp + GitHub Chatbot (example@example.com)",
         "database_file": "database.json",
-        "handled_events": [
-            "deployment",
-            "issues",
-            "issue_comment",
-            "pull_request",
-            "pull_request_review",
-            "release",
-            "repository"
-        ],
-        "logging": {
-            "enabled": true,
-            "file": "logfile",
-            "tags": {
-                "security": "SECURITY",
-                "error": "ERROR"
-            }
-        },
         "messages": {
             "help": "available commands are:<ul><li>subscribe &lt;repo&gt;</li><li>unsubscribe &lt;repo&gt;</li><li>list</li></ul>",
             "list_repos": "<strong>Currently subscribed to</strong><ul><% repositories.forEach(s => { %><li><%= s %></li><% }); %></ul>",

@@ -14,12 +14,12 @@
             "issue_link": "issue <a href='<%= issue.html_url %>'>💩<%= issue.title %></a>"
         },
         "actions": {
-            "deleted": "<%- user_link %> deleted issue 💩<%= issue.title %>",
+            "deleted": "😰 <%- user_link %> deleted issue 💩<%= issue.title %>",
             "transferred": "<%- user_link %> transferred <%- issue_link %> to <a href='<%= respository.html_url %>'><%= repository.full_name %></a>",
-            "assigned": "<%- user_link %> assigned <%- issue_link %> to <a href='<%= assignee.html_url %>>@<%= assignee.login %></a>",
-            "unassigned": "<%- user_link %> unassigned <%- issue_link %> from <a href='<%= assignee.html_url %>>@<%= assignee.login %></a>",
-            "labeled": "<%- user_link %> labeled <%- issue_link %> as <pre><%= label.name %></pre>",
-            "unlabeled": "<%- user_link %> removed label <pre><%= label.name %></pre> from <%- issue_link %>",
+            "assigned": "📥 <%- user_link %> assigned <%- issue_link %> to <a href='<%= assignee.html_url %>>@<%= assignee.login %></a>",
+            "unassigned": "📤 <%- user_link %> unassigned <%- issue_link %> from <a href='<%= assignee.html_url %>>@<%= assignee.login %></a>",
+            "labeled": "🏷️ <%- user_link %> labeled <%- issue_link %> as <pre><%= label.name %></pre>",
+            "unlabeled": "🏷️ <%- user_link %> removed label <pre><%= label.name %></pre> from <%- issue_link %>",
             "milestoned": "<%- user_link %> <a href='<%= milestone.html_url %>'>milestoned</a> <%- issue_link %>",
             "default": "<%- user_link %> <%= action %> <%- issue_link %>"
         }

@@ -8,7 +8,7 @@
     "local:run": "NODE_ENV=development node dist/index.js",
     "docker:build": "docker-compose -f docker/docker-compose.dev.yml build",
     "docker:run": "docker-compose -f docker/docker-compose.dev.yml up",
-    "production:run": "NODE_ENV=production forever -ae error.log dist/index.js",
+    "production:run": "NODE_ENV=production forever -m 20 -ae error.log dist/index.js",
     "format": "prettier --write \"app/**/*.ts\""
   },
   "repository": {

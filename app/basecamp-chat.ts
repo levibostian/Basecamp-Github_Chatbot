@@ -1,7 +1,6 @@
 import axios from "axios"
 
 import config from "@app/config"
-import logger from "@app/logger"
 
 function attachBasecampUserMention(message: string, userId: string): string {
   return `<bc-attachment sgid="${userId}"></bc-attachment>, ${message}`
@@ -23,8 +22,7 @@ export function SendBasecampChat(
       { headers: { "User-Agent": config.basecamp_user_agent } }
     )
     .catch(err => {
-      logger.log(
-        config.logging.tags.error,
+      throw Error(
         `Failed to POST ${message} to ${chatUrl}\n${err}\n${err.stack}`
       )
     })

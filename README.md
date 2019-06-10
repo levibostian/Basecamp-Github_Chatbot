@@ -53,4 +53,6 @@ The `templates` object defines snippets that can be reused in the messages for e
 
 ## Development
 
-Non-fatal errors and security exceptions (such as invalid access key) are logged to the file in `config.logging.file` when `config.logging.enabled` is `true`.
+To get started developing, follow the directions in the [Setup section](#Setup). In your `config.json` file, make sure you have an entry for the `development` environment. Run `npm run build` followed by `npm run local:run`, or `npm run docker:build` followed by `npm run docker:run` to run the server in development mode.
+
+Errors are logged to `error.log` when running in production.

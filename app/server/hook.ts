@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from "express"
 
 import config from "@app/config"
 import db from "@app/database"
-import logger from "@app/logger"
 
 import { SendBasecampChat } from "@app/basecamp-chat"
 import { GithubPayload, TranslateGithubPayload } from "@app/github-webhook"
@@ -36,14 +35,10 @@ function dispatchMessages(event: string, payload: GithubPayload): void {
     }
   }
 
-  if (!config.handled_events.includes(event)) {
-    return
-  }
-
   const message = TranslateGithubPayload(event, payload)
-  db.getChatsByRepository(repo).forEach(chatUrl => {
+  db.getChatsByRepository(repo).forEach(chatUrl =>
     SendBasecampChat(chatUrl, message)
-  })
+  )
 }
 
 export function VerifyGithubHMAC(
@@ -74,8 +69,7 @@ export function GithubWebhook(
 
   // Ensure the request came from Github
   if (!req.hmac_verified) {
-    logger.log(
-      config.logging.tags.security,
+    throw Error(
       "Attempted access to /hook with invalid signature: " +
         req.connection.remoteAddress
     )
@@ -85,12 +79,10 @@ export function GithubWebhook(
   // Custom header set by GithHub to distinguish between events
   const event = req.header("X-GitHub-Event")
   if (!event) {
-    logger.log(
-      config.logging.tags.error,
+    throw Error(
       "Event header missing from request to /hook: " +
         req.connection.remoteAddress
     )
-    return next()
   }
 
   dispatchMessages(event, req.body)
