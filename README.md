@@ -110,6 +110,7 @@ Click <kbd>Add this chatbot</kbd> and you're ready to go!
 
 ## Usage
 Interact with the bot by chatting `!<bot-name> <command>` in any campfire.  Available commands are:
+
 | Command | Action |
 | --- | --- |
 | `help` | provides a brief summary of commands |
