@@ -9,8 +9,8 @@ if (!(environment in configurationJSON)) {
 
 type Configuration = {
   [key: string]: {
+    port: number
     basecamp_user_agent: string
-    database_file: string
     organization: string
     hmac_secret: string
     access_key: string

@@ -1,5 +1,7 @@
+import config from "@app/config"
 import server from "@app/server"
 
-server.listen(3000, () => {
-  console.log("Server listening on :3000")
+const port = config.port ? config.port : 3000
+server.listen(port, () => {
+  console.log(`Server listening on :${port}`)
 })

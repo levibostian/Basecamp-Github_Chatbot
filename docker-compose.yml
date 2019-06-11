@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  basecamp-github-chatbot:
+    image: foundersclubsoftware/basecamp-github-chatbot:latest
+    container_name: basecamp-github-chatbot
+
+    volumes:
+      - ./config/:/home/app/config/
+      - ./database.json:/home/app/database.json
+      - ./error.log:/home/app/error.log
+    ports:
+      - '3000:3000'

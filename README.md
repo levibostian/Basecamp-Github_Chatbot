@@ -12,6 +12,10 @@ Basecamp + Github Chatbot provides teams with a simple solution for customizable
 
 * [Features](#Features)
 * [Installation](#Installation)
+    * [Configuration](#Configuration)
+    * [Deployment](#Deployment)
+    * [GitHub Setup](#GitHub%20Setup)
+    * [Basecamp Setup](#Basecamp%20Setup)
 * [Usage](#Usage)
 * [Customizing Messages](#Customizing%20Messages)
 * [Contributing](#Contributing)
@@ -46,8 +50,8 @@ Clone this repository onto your server. In the `config` directory, copy `config.
 
 | Key | Value | Example |
 | --- | --- | --- |
+| <kbd>port</kbd> | the port to run the server on | 3000 (default) |
 | <kbd>basecamp_user_agent</kbd> | user agent to use when making requests to the Basecamp API <sup>[[note]](https://github.com/basecamp/bc3-api#identifying-your-application)</sup> | Your-Org-Bot (your-email@example.org) |
-| <kbd>database_file</kbd> | Path to database file. Recommend backing it up. | config_database.json |
 | <kbd>organization</kbd> | GitHub organization name | your-github-org-name | 
 | <kbd>hmac_secret</kbd> | 20 character hex key also provided to GitHub | (see below) |
 | <kbd>access_key</kbd> | an access key of your choice to prevent abuse | (see below) | 
@@ -64,20 +68,29 @@ $ hexdump -n 20 -e '20/1 "%02x" 1 "\n"' /dev/urandom
 The configuration file allows you to define separate configurations for each possible value of `NODE_ENV`. If you are only looking to run this application in production, the "production" key already setup in `config.example.json` will do just fine. 
 
 #### Deployment
+You have 2 choices on how to run the application: Docker (recommended and tested), or Nodejs. The server runs on port 3000 by default, but you can modify th
 
-You have 2 choices on how to run the application: Docker (recommended and tested), or Nodejs. 
+##### Docker
+If you would like to run your server in a Docker container, you only need to keep the `config` directory, and optionally `docker-compose.yml`. The command below will run the server, using the `config` directory in your current directory as well as storing the database file locally.
 
+```
+$ docker run -p 3000 -v $(pwd)/config/:/home/app/config/ -v $(pwd)/database.json:/home/app/database.json foundersclubsoftware/basecamp-github-chatbot:latest
+```
+
+To make things simple, `docker-compose.yml` in the root of this repository performs the same task. Modify the volumes to suit your needs, then run
+
+```
+$ docker-compose -f docker-compose.yml up
+# or
+$ docker-compose -f docker-compose.yml up -d   # detached
+```
+
+##### Node.js
 If you plan to run Node directly on your server and not use Docker, simply build and run on your server: 
 ```
 $ npm install 
 $ npm run _build
 $ npm run _production:run
-```
-
-If you would like to run your server in a Docker container, first build the image, then run it:
-```
-$ npm run production:build
-$ npm run production:run
 ```
 
 Errors are logged to `error.log` when running in production. 
