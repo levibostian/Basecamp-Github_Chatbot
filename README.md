@@ -46,7 +46,7 @@ Clone this repository onto your server. In the `config` directory, copy `config.
 
 | Key | Value | Example |
 | --- | --- | --- |
-| <kbd>basecamp_user_agent</kbd> | user agent to use when making requests to the Basecamp API | Your-Org-Bot |
+| <kbd>basecamp_user_agent</kbd> | user agent to use when making requests to the Basecamp API <sup>[[note]](https://github.com/basecamp/bc3-api#identifying-your-application)</sup> | Your-Org-Bot (your-email@example.org) |
 | <kbd>database_file</kbd> | Path to database file. Recommend backing it up. | config_database.json |
 | <kbd>organization</kbd> | GitHub organization name | your-github-org-name | 
 | <kbd>hmac_secret</kbd> | 20 character hex key also provided to GitHub | (see below) |
