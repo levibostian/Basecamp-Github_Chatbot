@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  app:
+    image: chatbot-app:dev
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile-app.dev
+    container_name: chatbot-app-dev
+
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '3000:3000'
+    volumes:
+      - ..:/home/app/app

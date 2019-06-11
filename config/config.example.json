@@ -1,0 +1,9 @@
+{
+    "production": {
+        "basecamp_user_agent": "Basecamp + GitHub Chatbot (example@example.com)",
+        "database_file": "database.json",
+        "organization": "exampleorg",
+        "hmac_secret": "",
+        "access_key": ""
+    }
+}

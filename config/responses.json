@@ -1,0 +1,9 @@
+{
+    "help": "available commands are:<ul><li>subscribe &lt;repo&gt;</li><li>unsubscribe &lt;repo&gt;</li><li>list</li></ul> Use only the repo name, omitting the owner (e.g. <em>repo</em> instead of <em>myorg/repo</em>).",
+    "list_repos": "<strong>Currently subscribed to</strong><ul><% repositories.forEach(s => { %><li><%= s %></li><% }); %></ul>",
+    "list_empty": "This chat is not subscribed to any repositories.",
+    "subscribe": "Successfully subscribed to updates on <a href='https://github.com/<%= organization %>/<%= repo %>'><%= organization %>/<%= repo %></a>.",
+    "unrecognized": "I didn't catch that. Try the <strong>help</strong> command to learn how to use me!",
+    "unsubscribe": "Successfully unsubscribed from updates for <a href='https://github.com/<%= organization %>/<%= repo %>'><%= organization %>/<%= repo %></a>.",
+    "unsubscribe_fail": "This chat is not subscribed to <%= repo %>."
+}

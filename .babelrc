@@ -1,0 +1,25 @@
+{
+    "presets": [
+      ["@babel/env", {
+        "targets": {
+          "node": "current"
+        }
+      }], "@babel/preset-typescript"
+    ],
+    "retainLines": true,
+    "env": {
+      "debug": {
+        "sourceMaps": "inline",
+        "retainLines": true
+      }
+    },
+    "plugins": [
+        ["module-resolver", {
+          "root": ["."],
+          "alias": {
+            "@app": "./app",
+            "@config": "./config"
+          }
+        }]
+    ]
+}

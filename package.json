@@ -1,0 +1,62 @@
+{
+  "name": "basecamp-github-chatbot",
+  "version": "0.1.0",
+  "description": "A more advanced Basecamp chatbot to integrate GitHub and Basecamp",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist && babel app --out-dir dist --copy-files --extensions \".ts\"",
+    "local:run": "NODE_ENV=development node dist/index.js",
+    "docker:build": "docker-compose -f docker/docker-compose.dev.yml build",
+    "docker:run": "docker-compose -f docker/docker-compose.dev.yml up",
+    "production:run": "NODE_ENV=production forever -m 20 -ae error.log dist/index.js",
+    "format": "prettier --write \"app/**/*.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foundersclubsoftware/Basecamp-Github_Chatbot.git"
+  },
+  "keywords": [
+    "basecamp",
+    "github",
+    "chat",
+    "bot",
+    "chatbot"
+  ],
+  "author": "thrymgjol",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/foundersclubsoftware/Basecamp-Github_Chatbot/issues"
+  },
+  "homepage": "https://github.com/foundersclubsoftware/Basecamp-Github_Chatbot#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "ejs": "^2.6.1",
+    "express": "^4.17.1",
+    "forever": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/ejs": "^2.6.3",
+    "@types/express": "^4.16.1",
+    "@types/yargs": "^13.0.0",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "husky": "^2.4.0",
+    "lint-staged": "^8.1.7",
+    "prettier": "^1.17.1",
+    "yargs": "^13.2.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npm run format",
+      "git add"
+    ]
+  }
+}
