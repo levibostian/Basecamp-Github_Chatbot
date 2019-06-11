@@ -1,7 +1,7 @@
 import ejs from "ejs"
 
-import config from "@app/config"
 import db from "@app/database"
+import responses from "@app/responses"
 
 import { SendBasecampChat } from "@app/basecamp-chat"
 import { ChatCommandArguments } from ".."
@@ -15,9 +15,9 @@ export function handler(args: ChatCommandArguments): void {
   if (repositories.length) {
     SendBasecampChat(
       args.responseUrl,
-      ejs.render(config.messages.list_repos, { repositories })
+      ejs.render(responses.list_repos, { repositories })
     )
   } else {
-    SendBasecampChat(args.responseUrl, config.messages.list_empty)
+    SendBasecampChat(args.responseUrl, responses.list_empty)
   }
 }

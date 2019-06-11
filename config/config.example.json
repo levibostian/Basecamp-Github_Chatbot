@@ -2,15 +2,7 @@
     "production": {
         "basecamp_user_agent": "Basecamp + GitHub Chatbot (example@example.com)",
         "database_file": "database.json",
-        "messages": {
-            "help": "available commands are:<ul><li>subscribe &lt;repo&gt;</li><li>unsubscribe &lt;repo&gt;</li><li>list</li></ul>",
-            "list_repos": "<strong>Currently subscribed to</strong><ul><% repositories.forEach(s => { %><li><%= s %></li><% }); %></ul>",
-            "list_empty": "This chat is not subscribed to any repositories.",
-            "subscribe": "Successfully subscribed to notifications for <%= repo %>.",
-            "unrecognized": "I didn't catch that. Try the <strong>help</strong> command to learn how to use me!",
-            "unsubscribe": "Successfully unsubscribed from notifications for <%= repo %>.",
-            "unsubscribe_fail": "This chat is not subscribed to <%= repo %>."
-        },
+        "organization": "exampleorg",
         "hmac_secret": "",
         "access_key": ""
     }

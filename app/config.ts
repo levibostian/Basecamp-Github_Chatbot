@@ -11,17 +11,7 @@ type Configuration = {
   [key: string]: {
     basecamp_user_agent: string
     database_file: string
-
-    messages: {
-      help: string
-      list_repos: string
-      list_empty: string
-      subscribe: string
-      unrecognized: string
-      unsubscribe: string
-      unsubscribe_fail: string
-    }
-
+    organization: string
     hmac_secret: string
     access_key: string
   }
