@@ -68,7 +68,7 @@ $ hexdump -n 20 -e '20/1 "%02x" 1 "\n"' /dev/urandom
 The configuration file allows you to define separate configurations for each possible value of `NODE_ENV`. If you are only looking to run this application in production, the "production" key already setup in `config.example.json` will do just fine. 
 
 #### Deployment
-You have 2 choices on how to run the application: Docker (recommended and tested), or Nodejs. The server runs on port 3000 by default, but you can modify the `port` setting in `config.json`.
+You have 2 choices on how to run the application: Docker (recommended and tested), or Nodejs. The server runs on port 3000 by default, but you can modify the <kbd>port</kbd> setting in `config.json`.
 
 ##### Docker
 If you would like to run your server in a Docker container, you only need to keep the `config` directory, and optionally `docker-compose.yml`. The command below will run the server, using the `config` directory in your current directory as well as storing the database file locally.
@@ -84,6 +84,8 @@ $ docker-compose -f docker-compose.yml up
 # or
 $ docker-compose -f docker-compose.yml up -d   # detached
 ```
+
+If you have changed the <kbd>port</kbd> setting from the default of 3000, you will have to modify the arguments to docker or your `docker-compose.yml`.
 
 ##### Node.js
 If you plan to run Node directly on your server and not use Docker, simply build and run on your server: 

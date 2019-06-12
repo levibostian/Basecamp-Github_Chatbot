@@ -5,6 +5,8 @@ services:
     image: foundersclubsoftware/basecamp-github-chatbot:latest
     container_name: basecamp-github-chatbot
 
+    environment:
+      - NODE_ENV=production
     volumes:
       - ./config/:/home/app/config/
       - ./database.json:/home/app/database.json
