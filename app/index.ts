@@ -1,5 +1,9 @@
+import dotenv from "dotenv"
+
 import server from "@app/server"
 
-server.listen(3000, () => {
-  console.log("Server listening on :3000")
+dotenv.config()
+
+server.listen(process.env.SERVER_PORT, () => {
+  console.log(`Server listening on :${process.env.SERVER_PORT}`)
 })
