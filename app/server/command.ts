@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 
 import { ParseBasecampPayload } from "@app/chat-command"
-import config from "@app/config"
 
 export function ChatCommand(
   req: Request,
@@ -11,7 +10,7 @@ export function ChatCommand(
   res.status(204).send()
 
   // Don't handle requests where the access key doesn't match
-  if (req.query.access_key !== config.access_key) {
+  if (req.query.access_key !== process.env.BASECAMP_ACCESS_KEY) {
     throw Error(
       "Attempted access to /command with invalid access key: " +
         req.connection.remoteAddress

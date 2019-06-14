@@ -2,14 +2,16 @@ version: '3.7'
 
 services:
   basecamp-github-chatbot:
-    image: foundersclubsoftware/basecamp-github-chatbot:latest
-    container_name: basecamp-github-chatbot
+    image: basecamp-github-chatbot:test
 
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
     volumes:
-      - ./config/:/home/app/config/
       - ./database.json:/home/app/database.json
       - ./error.log:/home/app/error.log
+    # If supplying your own templates:
+    # - ./templates.json:/home/app/templates.json
     ports:
-      - '3000:3000'
+      - '${SERVER_PORT}:${SERVER_PORT}'

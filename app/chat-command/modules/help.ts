@@ -1,6 +1,5 @@
-import responses from "@app/responses"
-
 import { SendBasecampChat } from "@app/basecamp-chat"
+import { responses } from "@app/templates"
 import { ChatCommandArguments } from ".."
 
 export const command = "help"

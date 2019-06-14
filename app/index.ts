@@ -1,7 +1,9 @@
-import config from "@app/config"
+import dotenv from "dotenv"
+
 import server from "@app/server"
 
-const port = config.port ? config.port : 3000
-server.listen(port, () => {
-  console.log(`Server listening on :${port}`)
+dotenv.config()
+
+server.listen(process.env.SERVER_PORT, () => {
+  console.log(`Server listening on :${process.env.SERVER_PORT}`)
 })

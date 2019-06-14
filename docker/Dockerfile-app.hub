@@ -10,11 +10,8 @@ FROM node:10-alpine
 ENV HOME=/home/app
 WORKDIR ${HOME}
 
-COPY config ${HOME}/config/
-COPY package*.json ${HOME}/
+COPY package*.json templates.json ${HOME}/
 COPY --from=builder /build/dist ${HOME}/dist
-RUN rm config/config.example.json && npm install --production
-
-EXPOSE 3000
+RUN npm install --production
 
 CMD npm run _production:run
