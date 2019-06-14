@@ -53,7 +53,7 @@ export function VerifyGithubHMAC(
   }
 
   const body = buf.toString(encoding)
-  const hmac = crypto.createHmac("sha1", String(process.env.GITHUB_HMAC_SECRET))
+  const hmac = crypto.createHmac("sha1", process.env.GITHUB_HMAC_SECRET!)
   const signature = "sha1=" + hmac.update(body).digest("hex")
 
   req.hmac_verified = signature === senderSignature

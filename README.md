@@ -73,7 +73,7 @@ If you would like to run your server in a Docker container, you only need `.env`
 
 To simplify things, the default `docker-compose.yml` will run a single container, passing the environment variables in `.env`. By default the error log will be stored in the current local directory as `error.log`, and the database as `database.json`.
 
-See the relevant comment in `docker-compose.yml` for help supplying your own message templates.
+See the relevant comment in the `volumes` section of `docker-compose.yml` for help supplying your own message templates.
 
 ```
 $ docker-compose -f docker-compose.yml up
