@@ -19,7 +19,7 @@ env:
 
 before_script:
   - docker build -t basecamp-github-chatbot:test -f docker/Dockerfile-app.hub .
-  - docker run -d basecamp-github-chatbot:test
+  - docker run -d -p ${SERVER_PORT}:${SERVER_PORT} basecamp-github-chatbot:test
 script:
   - >
     RETRIES=10;
