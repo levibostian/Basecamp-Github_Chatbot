@@ -10,16 +10,12 @@ addons:
 
 env:
   global:
-    - NODE_ENV=test
     - SERVER_PORT=3000
-    - BASECAMP_ACCESS_KEY=00000000000000000000000000000000
-    - BASECAMP_USER_AGENT=Basecamp + GitHub Chatbot (test@example.org)
-    - GITHUB_ORGANIZATION=examplesoft
-    - GITHUB_HMAC_SECRET=0000000000000000000000000000000000000000
+
 
 before_script:
   - docker build -t basecamp-github-chatbot:test -f docker/Dockerfile-app.hub .
-  - docker run -d -p 3000:3000 --name chatbot-test basecamp-github-chatbot:test
+  - docker run -d -p ${SERVER_PORT}:${SERVER_PORT} --name chatbot-test --env-file=.env.test basecamp-github-chatbot:test
 script:
   - sleep 5
   - docker ps
