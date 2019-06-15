@@ -1,4 +1,4 @@
-language: node_js
+language: minimal
 sudo: required
 services:
   - docker
@@ -9,16 +9,25 @@ addons:
       - docker-ce
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.24.0
+  - NODE_ENV=test
+  - SERVER_PORT=3000
+  - BASECAMP_ACCESS_KEY=00000000000000000000000000000000
+  - BASECAMP_USER_AGENT=Basecamp + GitHub Chatbot (test@example.org)
+  - GITHUB_ORGANIZATION=examplesoft
+  - GITHUB_HMAC_SECRET=0000000000000000000000000000000000000000
 
-before_install:
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-install:
-  - sudo apt-get install -y curl
 before_script:
-  - docker-compose -f test/docker-compose.yml up --build -d 
+  - docker build -t basecamp-github-chatbot:test -f docker/Dockerfile-app.hub .
+  - docker run -d basecamp-github-chatbot:test
 script:
-  - test/test.sh
+  - >
+    RETRIES=10;
+    TIMEOUT=1;
+    while [[ true ]]; do
+      ((RETRIES--));
+      echo "Waiting for response from server... $RETRIES";
+      sleep $TIMEOUT;
+      curl -sS -X POST http://localhost:${SERVER_PORT}/hook;
+      if [[ "$?" = "0" ]]; then echo "Server responded!"; break; fi;
+      if [[ "$TRIES" -le "0" ]]; then echo "Failed to contact server."; exit 1; break; fi;
+    done;
