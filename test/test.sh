@@ -3,6 +3,6 @@
 # Exit on any error
 set -e
 
-curl -sS -X POST http://basecamp-github-chatbot:3000/hook
+curl -sS -X POST http://localhost:3000/hook
 
 exit $?
