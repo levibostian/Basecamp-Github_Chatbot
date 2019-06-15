@@ -9,9 +9,6 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      - ./database.json:/home/app/database.json
-      - ./error.log:/home/app/error.log
-    # If supplying your own templates:
-    # - ./templates.json:/home/app/templates.json
+      - ./:/var/lib/app/data/
     ports:
       - '${SERVER_PORT}:${SERVER_PORT}'

@@ -1,0 +1,11 @@
+language: node_js
+sudo: required
+services:
+  - docker
+
+install:
+  - sudo apt-get install -y curl
+before_script:
+  - docker-compose -f test/docker-compose.yml up --build -d 
+script:
+  - test/test.sh

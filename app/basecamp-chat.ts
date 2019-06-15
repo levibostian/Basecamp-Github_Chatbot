@@ -1,5 +1,6 @@
 import axios from "axios"
 
+import config from "@app/config"
 import { responses } from "@app/templates"
 
 function attachBasecampUserMention(message: string, userId: string): string {
@@ -19,7 +20,7 @@ export function SendBasecampChat(
     .post(
       chatUrl,
       { content: message },
-      { headers: { "User-Agent": process.env.BASECAMP_USER_AGENT } }
+      { headers: { "User-Agent": config.basecamp_user_agent } }
     )
     .catch(err => {
       throw Error(

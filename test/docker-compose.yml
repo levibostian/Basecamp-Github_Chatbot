@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  basecamp-github-chatbot:
+    image: basecamp-github-chatbot:test
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile-app.hub
+
+    environment:
+      - NODE_ENV=test
+      - SERVER_PORT=3000
+      - BASECAMP_ACCESS_KEY=00000000000000000000000000000000
+      - BASECAMP_USER_AGENT=Basecamp + GitHub Chatbot (test@example.org)
+      - GITHUB_ORGANIZATION=examplesoft
+      - GITHUB_HMAC_SECRET=0000000000000000000000000000000000000000

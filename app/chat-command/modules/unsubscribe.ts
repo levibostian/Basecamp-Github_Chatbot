@@ -3,6 +3,7 @@ import ejs from "ejs"
 import db from "@app/database"
 
 import { SendBasecampChat } from "@app/basecamp-chat"
+import config from "@app/config"
 import { responses } from "@app/templates"
 import { ChatCommandArguments } from ".."
 
@@ -19,7 +20,7 @@ export function handler(args: ChatCommandArguments): void {
       args.responseUrl,
       ejs.render(responses.unsubscribe, {
         repo: args.repo,
-        organization: process.env.GITHUB_ORGANIZATION,
+        organization: config.github_organization,
       })
     )
   } else {
