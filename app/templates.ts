@@ -4,7 +4,13 @@ import path from "path"
 
 import config from "@app/config"
 
-const templatePath = path.join(config.data_directory, "templates.json")
+const TEMPLATE_FILE = "templates.json"
+const defaultPath = TEMPLATE_FILE
+const userTemplatePath = path.join(config.data_directory, "templates.json")
+
+const templatePath = fs.existsSync(userTemplatePath)
+  ? userTemplatePath
+  : defaultPath
 
 const templates: {
   notifications: {
