@@ -4,7 +4,7 @@ import db from "@app/database"
 
 import { SendBasecampChat } from "@app/basecamp-chat"
 import config from "@app/config"
-import { responses } from "@app/templates"
+import { CommandResponses } from "@app/templates"
 import { ChatCommandArguments } from ".."
 
 export const command = "subscribe <repo>"
@@ -15,7 +15,7 @@ export function handler(args: ChatCommandArguments): void {
   db.addRepositoryToChat(args.repo, args.responseUrl)
   SendBasecampChat(
     args.responseUrl,
-    ejs.render(responses.subscribe, {
+    ejs.render(CommandResponses.subscribe, {
       repo: args.repo,
       organization: config.github_organization,
     })

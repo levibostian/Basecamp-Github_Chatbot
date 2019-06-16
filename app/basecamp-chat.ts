@@ -1,7 +1,7 @@
 import axios from "axios"
 
 import config from "@app/config"
-import { responses } from "@app/templates"
+import { CommandResponses } from "@app/templates"
 
 function attachBasecampUserMention(message: string, userId: string): string {
   return `<bc-attachment sgid="${userId}"></bc-attachment>, ${message}`
@@ -33,5 +33,5 @@ export function SendBasecampDefaultError(
   chatUrl: string,
   userId: string
 ): void {
-  SendBasecampChat(chatUrl, responses.unrecognized, userId)
+  SendBasecampChat(chatUrl, CommandResponses.unrecognized, userId)
 }

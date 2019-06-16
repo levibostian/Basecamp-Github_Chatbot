@@ -54,7 +54,8 @@ Copy `.env.example` to `.env`. Set the following keys appropriately:
 | `BASECAMP_ACCESS_KEY` | an access key of your choice to prevent abuse | (see below) | 
 | `BASECAMP_USER_AGENT` | user agent to use when making requests to the Basecamp API <sup>[[note]](https://github.com/basecamp/bc3-api#identifying-your-application)</sup> | Your-Org-Bot (your-email@example.org) |
 | `GITHUB_HMAC_SECRET` | 20 character hex key also provided to GitHub | (see below) |
-| `GITHUB_ORGANIZATION` | GitHub organization name | your-github-org-name | 
+| `GITHUB_ORGANIZATION` | GitHub organization name | your-github-org-name |
+| `DATA_DIRECTORY` | Where to store database and logs. Default `.`. | `data` |
 
 Here are some good ways to generate your HMAC secret and access key: 
 ```
@@ -144,7 +145,7 @@ When subscribing or unsubscribing, omit the organization prefix (e.g. `repo` ins
 
 ## Customizing Messages
 
-If you would like to add support for other events or change the message templates, edit the <kbd>notifications</kbd> key of `templates.json`. Any events listed [here](https://developer.github.com/v3/activity/events/types/) are supported. If you limited your webhook on Github to certain events, you may need to update its scope.
+If you would like to add support for other events or change the message templates, edit the <kbd>notifications</kbd> key of `templates.json`. Place your modified `templates.json` in your data directory, alongside where the database is stored. Any events listed [here](https://developer.github.com/v3/activity/events/types/) are supported. If you limited your webhook on Github to certain events, you may need to update its scope.
 
 Notification entries are of the form
 ```
