@@ -32,7 +32,7 @@ export async function ParseBasecampPayload(
   payload: BasecampCommandPayload
 ): Promise<void> {
   const validator = new Validator()
-  if (!validator.validate(payload, BasecampCommandPayloadSchema)) {
+  if (!validator.validate(payload, BasecampCommandPayloadSchema).valid) {
     return
   }
 
