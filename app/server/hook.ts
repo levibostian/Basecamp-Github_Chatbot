@@ -72,7 +72,6 @@ export function GithubWebhook(
       "Attempted access to /hook with invalid signature: " +
         req.connection.remoteAddress
     )
-    return next()
   }
 
   // Custom header set by GithHub to distinguish between events
