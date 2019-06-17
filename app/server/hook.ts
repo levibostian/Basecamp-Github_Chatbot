@@ -53,7 +53,7 @@ export function VerifyGithubHMAC(
   }
 
   const body = buf.toString(encoding)
-  const hmac = crypto.createHmac("sha1", process.env.GITHUB_HMAC_SECRET!)
+  const hmac = crypto.createHmac("sha1", String(process.env.GITHUB_HMAC_SECRET))
   const signature = "sha1=" + hmac.update(body).digest("hex")
 
   req.hmac_verified = signature === senderSignature
@@ -64,10 +64,9 @@ export function GithubWebhook(
   res: Response,
   next: NextFunction
 ): void {
-  res.status(204).send()
-
   // Ensure the request came from Github
   if (!req.hmac_verified) {
+    res.status(204).send()
     throw Error(
       "Attempted access to /hook with invalid signature: " +
         req.connection.remoteAddress
@@ -77,12 +76,20 @@ export function GithubWebhook(
   // Custom header set by GithHub to distinguish between events
   const event = req.header("X-GitHub-Event")
   if (!event) {
+    res.status(404).send()
     throw Error(
       "Event header missing from request to /hook: " +
         req.connection.remoteAddress
     )
   }
 
-  dispatchMessages(event, req.body)
+  try {
+    dispatchMessages(event, req.body)
+  } catch (err) {
+    res.status(404).send()
+    throw err
+  }
+
+  res.status(204).send()
   next()
 }

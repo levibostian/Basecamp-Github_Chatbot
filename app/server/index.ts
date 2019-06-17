@@ -1,9 +1,11 @@
 import express from "express"
+import helmet from "helmet"
 
 import { ChatCommand } from "./command"
 import { GithubWebhook, VerifyGithubHMAC } from "./hook"
 
 const server = express()
+server.use(helmet())
 server.disable("x-powered-by")
 
 server.post(
