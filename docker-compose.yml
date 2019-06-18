@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  basecamp-github-chatbot:
+    image: foundersclubsoftware/basecamp-github-chatbot:test
+
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./:/var/lib/app/data/
+    ports:
+      - '${SERVER_PORT}:${SERVER_PORT}'

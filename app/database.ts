@@ -1,4 +1,5 @@
 import fs from "fs"
+import path from "path"
 
 import config from "@app/config"
 
@@ -8,6 +9,7 @@ type Chat = {
 }
 
 const ENCODING = "utf8"
+const STORE_FILE = path.join(config.data_directory, "database.json")
 
 class ChatStore {
   private chats: Chat[]
@@ -18,23 +20,23 @@ class ChatStore {
 
   private saveFile(): void {
     fs.promises
-      .writeFile(config.database_file, JSON.stringify(this.chats), ENCODING)
+      .writeFile(STORE_FILE, JSON.stringify(this.chats), ENCODING)
       .catch(err => {
         throw Error(
-          `unable to save database, error writing to ${
-            config.database_file
-          }\n${err}\n${err.stack}`
+          `unable to save database, error writing to ${STORE_FILE}\n${err}\n${
+            err.stack
+          }`
         )
       })
   }
 
   private readFile(): Chat[] {
     // Empty/new database
-    if (!fs.existsSync(config.database_file)) {
+    if (!fs.existsSync(STORE_FILE)) {
       return []
     }
 
-    return JSON.parse(fs.readFileSync(config.database_file, ENCODING))
+    return JSON.parse(fs.readFileSync(STORE_FILE, ENCODING))
   }
 
   /* Get a subscription from a chat callback URL */

@@ -1,21 +1,33 @@
-import configurationJSON from "@config/config.json"
+import dotenv from "dotenv"
 
-const environment = process.env.NODE_ENV ? process.env.NODE_ENV : "default"
-if (!(environment in configurationJSON)) {
-  throw Error(
-    `Fatal error: no configuration found for environment '${environment}'`
-  )
-}
+dotenv.config()
 
-type Configuration = {
-  [key: string]: {
-    basecamp_user_agent: string
-    database_file: string
-    organization: string
-    hmac_secret: string
-    access_key: string
+const REQUIRED_VARIABLES = [
+  "SERVER_PORT",
+  "BASECAMP_ACCESS_KEY",
+  "BASECAMP_USER_AGENT",
+  "GITHUB_ORGANIZATION",
+  "GITHUB_HMAC_SECRET",
+]
+
+let missingVariables: string[] = []
+REQUIRED_VARIABLES.forEach(variable => {
+  if (!(variable in process.env) || !process.env[variable]) {
+    missingVariables.push(variable)
   }
+})
+
+if (missingVariables.length) {
+  console.log("Missing the following required environment variables:")
+  missingVariables.forEach(variable => console.log(`  - ${variable}`))
+  process.exit(1)
 }
 
-const configuration = configurationJSON as Configuration
-export default configuration[environment]
+export default {
+  server_port: process.env.SERVER_PORT!,
+  basecamp_access_key: process.env.BASECAMP_ACCESS_KEY!,
+  basecamp_user_agent: process.env.BASECAMP_USER_AGENT!,
+  github_organization: process.env.GITHUB_ORGANIZATION!,
+  github_hmac_secret: process.env.GITHUB_HMAC_SECRET!,
+  data_directory: process.env.DATA_DIRECTORY ? process.env.DATA_DIRECTORY : ".",
+}

@@ -1,11 +1,10 @@
 import crypto from "crypto"
 import { NextFunction, Request, Response } from "express"
 
+import { SendBasecampChat } from "@app/basecamp-chat"
 import config from "@app/config"
 import db from "@app/database"
-
-import { SendBasecampChat } from "@app/basecamp-chat"
-import { GithubPayload, TranslateGithubPayload } from "@app/github-webhook"
+import { GithubPayload, TranslateGithubPayload } from "@app/templates"
 
 /* Add the hmac_verified property to Request objects */
 declare global {
@@ -54,7 +53,7 @@ export function VerifyGithubHMAC(
   }
 
   const body = buf.toString(encoding)
-  const hmac = crypto.createHmac("sha1", config.hmac_secret)
+  const hmac = crypto.createHmac("sha1", config.github_hmac_secret)
   const signature = "sha1=" + hmac.update(body).digest("hex")
 
   req.hmac_verified = signature === senderSignature
@@ -65,26 +64,32 @@ export function GithubWebhook(
   res: Response,
   next: NextFunction
 ): void {
-  res.status(204).send()
-
   // Ensure the request came from Github
   if (!req.hmac_verified) {
+    res.status(204).send()
     throw Error(
       "Attempted access to /hook with invalid signature: " +
         req.connection.remoteAddress
     )
-    return next()
   }
 
   // Custom header set by GithHub to distinguish between events
   const event = req.header("X-GitHub-Event")
   if (!event) {
+    res.status(404).send()
     throw Error(
       "Event header missing from request to /hook: " +
         req.connection.remoteAddress
     )
   }
 
-  dispatchMessages(event, req.body)
+  try {
+    dispatchMessages(event, req.body)
+  } catch (err) {
+    res.status(404).send()
+    throw err
+  }
+
+  res.status(204).send()
   next()
 }

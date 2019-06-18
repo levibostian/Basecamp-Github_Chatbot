@@ -11,7 +11,7 @@ export function ChatCommand(
   res.status(204).send()
 
   // Don't handle requests where the access key doesn't match
-  if (req.query.access_key !== config.access_key) {
+  if (req.query.access_key !== config.basecamp_access_key) {
     throw Error(
       "Attempted access to /command with invalid access key: " +
         req.connection.remoteAddress
