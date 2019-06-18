@@ -1,4 +1,6 @@
-language: minimal
+language: node_js
+node_js:
+  - "10"
 sudo: required
 services:
   - docker
@@ -17,6 +19,7 @@ before_script:
   - docker build -t basecamp-github-chatbot:test -f docker/Dockerfile-app.hub .
   - docker run -d -p ${SERVER_PORT}:${SERVER_PORT} --name chatbot-test --env-file=.env.test basecamp-github-chatbot:test
 script:
+  - npm run lint
   - sleep 5
   - docker ps
   - docker logs chatbot-test
