@@ -1,9 +1,9 @@
 import crypto from "crypto"
 import { NextFunction, Request, Response } from "express"
 
-import db from "@app/database"
-
 import { SendBasecampChat } from "@app/basecamp-chat"
+import config from "@app/config"
+import db from "@app/database"
 import { GithubPayload, TranslateGithubPayload } from "@app/templates"
 
 /* Add the hmac_verified property to Request objects */
@@ -53,7 +53,7 @@ export function VerifyGithubHMAC(
   }
 
   const body = buf.toString(encoding)
-  const hmac = crypto.createHmac("sha1", String(process.env.GITHUB_HMAC_SECRET))
+  const hmac = crypto.createHmac("sha1", config.github_hmac_secret)
   const signature = "sha1=" + hmac.update(body).digest("hex")
 
   req.hmac_verified = signature === senderSignature

@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  app:
+    env_file:
+      - ../.env
+    ports:
+      - '${SERVER_PORT}:${SERVER_PORT}'
+    volumes:
+      - ..:/home/app/app
