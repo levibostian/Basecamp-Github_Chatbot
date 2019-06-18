@@ -1,10 +1,12 @@
+import { Validator } from "jsonschema"
 import yargs from "yargs"
 
 import { SendBasecampDefaultError } from "@app/basecamp-chat"
 
+import BasecampCommandPayloadSchema from "./basecamp-payload.schema.json"
 import * as commands from "./modules"
 
-type BasecampCommandPayload = {
+interface BasecampCommandPayload {
   command: string
   creator: {
     attachable_sgid: string
@@ -12,10 +14,10 @@ type BasecampCommandPayload = {
   callback_url: string
 }
 
-export type ChatCommandArguments = {
+export interface ChatCommandArguments {
   userId: string
   responseUrl: string
-  [key: string]: any
+  [key: string]: string
 }
 
 const ChatCommandParser = yargs
@@ -29,18 +31,14 @@ const ChatCommandParser = yargs
 export async function ParseBasecampPayload(
   payload: BasecampCommandPayload
 ): Promise<void> {
-  const command: string = payload.command
-  const userId: string = (payload.creator || {}).attachable_sgid
-  const responseUrl: string = payload.callback_url
-
-  // Validate payload
-  if (
-    typeof command !== "string" ||
-    typeof userId !== "string" ||
-    typeof responseUrl !== "string"
-  ) {
+  const validator = new Validator()
+  if (!validator.validate(payload, BasecampCommandPayloadSchema).valid) {
     return
   }
+
+  const command: string = payload.command
+  const userId: string = payload.creator.attachable_sgid
+  const responseUrl: string = payload.callback_url
 
   // Split on ALL whitespace
   const args: string[] = command.match(/\S+/g) || []

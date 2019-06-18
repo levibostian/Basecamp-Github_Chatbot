@@ -1,0 +1,21 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "security"
+    ],
+    "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "plugin:security/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "rules": {
+        "semi": "off",
+        "@typescript-eslint/indent": "off",
+        "@typescript-eslint/member-delimiter-style": "none",
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/camelcase": "warn"
+    }
+}
