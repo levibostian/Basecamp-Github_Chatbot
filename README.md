@@ -3,6 +3,7 @@
 </p>
 
 # Basecamp + GitHub Chatbot
+[![Build Status](https://travis-ci.com/foundersclubsoftware/Basecamp-Github_Chatbot.svg?branch=master)](https://travis-ci.com/foundersclubsoftware/Basecamp-Github_Chatbot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)][license]
 [![Issues](https://img.shields.io/github/issues/foundersclubsoftware/Basecamp-Github_Chatbot.svg)][issues]
 
