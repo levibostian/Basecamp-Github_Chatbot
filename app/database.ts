@@ -1,4 +1,7 @@
 import fs from "fs"
+import path from "path"
+
+import config from "@app/config"
 
 type Chat = {
   chat_url: string
@@ -6,7 +9,7 @@ type Chat = {
 }
 
 const ENCODING = "utf8"
-const STORE_FILE = "database.json"
+const STORE_FILE = path.join(config.data_directory, "database.json")
 
 class ChatStore {
   private chats: Chat[]

@@ -6,7 +6,7 @@
   "scripts": {
     "_build": "rm -rf dist && babel app --out-dir dist --copy-files --extensions \".ts\"",
     "_local:run": "NODE_ENV=development node dist/index.js",
-    "_production:run": "NODE_ENV=production forever -m 20 -ae error.log dist/index.js",
+    "_production:run": "NODE_ENV=production node dist/forever.js",
     "dev:build": "docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.override.yml build",
     "dev:run": "docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.override.yml up",
     "production:build": "docker-compose -f docker/docker-compose.yml -f docker/docker-compose.prod.override.yml build",
@@ -35,7 +35,7 @@
     "dotenv": "^8.0.0",
     "ejs": "^2.6.1",
     "express": "^4.17.1",
-    "forever": "^1.0.0",
+    "forever-monitor": "^1.7.1",
     "yargs": "^13.2.4"
   },
   "devDependencies": {
@@ -46,6 +46,7 @@
     "@types/dotenv": "^6.1.1",
     "@types/ejs": "^2.6.3",
     "@types/express": "^4.16.1",
+    "@types/forever-monitor": "^1.7.4",
     "@types/yargs": "^13.0.0",
     "babel-plugin-module-resolver": "^3.2.0",
     "husky": "^2.4.0",

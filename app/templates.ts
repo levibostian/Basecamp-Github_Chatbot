@@ -1,8 +1,18 @@
 import ejs from "ejs"
+import fs from "fs"
+import path from "path"
 
-import templateData from "../templates.json"
+import config from "@app/config"
 
-const templates = templateData as {
+const TEMPLATE_FILE = "templates.json"
+const defaultPath = TEMPLATE_FILE
+const userTemplatePath = path.join(config.data_directory, "templates.json")
+
+const templatePath = fs.existsSync(userTemplatePath)
+  ? userTemplatePath
+  : defaultPath
+
+const templates: {
   notifications: {
     [key: string]: {
       templates: { [key: string]: string }
@@ -18,9 +28,9 @@ const templates = templateData as {
     unsubscribe: string
     unsubscribe_fail: string
   }
-}
+} = JSON.parse(fs.readFileSync(templatePath).toString())
 
-export const responses = templates.responses
+export const CommandResponses = templates.responses
 
 export type GithubPayload = {
   [key: string]: any
