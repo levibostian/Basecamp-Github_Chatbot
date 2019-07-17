@@ -74,7 +74,13 @@
                 "edited": "🤥 <%- user_link %> edited a <%- review_link %> of <%- pull_request_link %>",
                 "dismissed": "🙃 <%- user_link %> dismissed a <%- review_link %> of <%- pull_request_link %>"
             }
-       },
+        },
+        "push": {
+            "templates": {},
+            "actions": {
+                "default": "🔥 <a href='<%= sender.html_url %>'>@<%= sender.login %></a> pushed changes to <a href='<%= repository.html_url %>'><%= repository.full_name %></a>"
+            }
+        },
         "release": {
             "templates": {
                 "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
