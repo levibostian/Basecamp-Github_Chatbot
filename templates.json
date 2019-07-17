@@ -49,7 +49,7 @@
         "pull_request": {
             "templates": {
                 "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
-                "pull_request_link": "pull request <a href='<%= pull_request.html_url %>'><%= pull_request.title =></a>"
+                "pull_request_link": "pull request <a href='<%= pull_request.html_url %>'><%= pull_request.title %></a>"
             },
             "actions": {
                 "assigned": "📥 <a href='<%= pull_request.assignee.html_url %>'>@<%= pull_request.assignee.login %></a> was assigned to <%- pull_request_link %> by <%- user_link %>",
@@ -66,7 +66,7 @@
         "pull_request_review": {
             "templates": {
                 "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
-                "pull_request_link": "pull request <a href='<%= pull_request.html_url %>'><%= pull_request.title</a>",
+                "pull_request_link": "pull request <a href='<%= pull_request.html_url %>'><%= pull_request.title %></a>",
                 "review_link": "<a href='<%= review.html_url %>'>review</a>"
             },
             "actions": {
