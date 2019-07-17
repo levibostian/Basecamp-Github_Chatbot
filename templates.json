@@ -49,7 +49,7 @@
         "pull_request": {
             "templates": {
                 "user_link": "<a href='<%= sender.html_url %>'>@<%= sender.login %></a>",
-                "pull_request_link": "pull request <a href='<%= pull_request.html_url %>'><%= pull_request.title</a>"
+                "pull_request_link": "pull request <a href='<%= pull_request.html_url %>'><%= pull_request.title =></a>"
             },
             "actions": {
                 "assigned": "📥 <a href='<%= pull_request.assignee.html_url %>'>@<%= pull_request.assignee.login %></a> was assigned to <%- pull_request_link %> by <%- user_link %>",
@@ -59,8 +59,8 @@
                 "labeled": "🏷️ <%- user_link %> labeled <%- pull_request_link %> as <pre><%= label.name %></pre>",
                 "unlabeled": "️🏷️ <%- user_link %> removed label <pre><%= label.name %></pre> from <%- pull_request_link %>",
                 "closed": "👌 <%- user_link %> closed <% if(pull_request.merged) { %>and merged<% } else { %>without merging<% } %> <%- pull_request_link %>",
-                "ready_for_review": "🙋 <%= user_link %> marked <%= pull_request_link %> ready for review",
-                "default": "💪 <%= user_link %> <%= action %> <%= pull_request_link %>"
+                "ready_for_review": "🙋 <%- user_link %> marked <%- pull_request_link %> ready for review",
+                "default": "💪 <%- user_link %> <%= action %> <%- pull_request_link %>"
             }
         },
         "pull_request_review": {
