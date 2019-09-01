@@ -6,7 +6,7 @@ import config from "@app/config"
 
 const TEMPLATE_FILE = "templates.json"
 const defaultPath = TEMPLATE_FILE
-const userTemplatePath = path.join(config.data_directory, "templates.json")
+const userTemplatePath = path.join(config.data_directory, TEMPLATE_FILE)
 
 const templatePath = fs.existsSync(userTemplatePath)
   ? userTemplatePath
@@ -32,7 +32,7 @@ const templates: {
 
 export const CommandResponses = templates.responses
 
-export type GithubPayload = {
+export interface GithubPayload {
   [key: string]: any
 
   action: string
@@ -53,7 +53,7 @@ export function TranslateGithubPayload(
     )
   }
 
-  let eventAction: string = "default"
+  let eventAction = "default"
   if ("action" in payload && payload.action in translation.actions) {
     eventAction = payload.action
   }
