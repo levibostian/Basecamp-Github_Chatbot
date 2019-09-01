@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 
 import config from "@app/config"
 import { CommandResponses } from "@app/templates"
@@ -11,12 +11,12 @@ export function SendBasecampChat(
   chatUrl: string,
   message: string,
   userId?: string
-): void {
+): Promise<AxiosResponse<any>> {
   if (userId) {
     message = attachBasecampUserMention(message, userId)
   }
 
-  axios
+  return axios
     .post(
       chatUrl,
       { content: message },
