@@ -1,5 +1,3 @@
-import axios from "axios"
-import MockAdapter from "axios-mock-adapter"
 import fs from "fs"
 import request from "supertest"
 
@@ -25,9 +23,7 @@ function basecampChatUrl(urlNumber: number): string {
 function testCommand(urlNumber: number, command: string): request.Test {
   const payload = {
     command,
-    creator: {
-      attachable_sgid: testSgid,
-    },
+    creator: { attachable_sgid: testSgid },
     callback_url: basecampChatUrl(urlNumber),
   }
 
@@ -35,10 +31,17 @@ function testCommand(urlNumber: number, command: string): request.Test {
     .post("/command")
     .query({ access_key: "access-key" })
     .send(payload)
-    .end(() => {})
+    .expect("Content-Type", /text\/html/)
+    .expect(200)
 }
 
-const axiosMock = new MockAdapter(axios)
+function expectMention(content: string): void {
+  const root = HTMLParser.parse(content)
+  const attachment = root.querySelector("bc-attachment")
+
+  expect(attachment).toHaveProperty("attributes.sgid")
+  expect(attachment.attributes.sgid).toEqual(testSgid)
+}
 
 const errorHandler = jest.fn((err, req, res, next) => next())
 server.use(errorHandler)
@@ -47,158 +50,91 @@ beforeEach(() => {
   fs.copyFileSync("tests/data/database.test.json", "tests/data/database.json")
   database.reload()
 
-  axiosMock.reset()
-  axiosMock.resetHistory()
-
   errorHandler.mockClear()
-})
-
-describe("POST /command", () => {
-  it("should do nothing with an invalid access key", done => {
-    request(server)
-      .post("/command")
-      .query({ access_key: "invalid-key" })
-      .end(() => {
-        expect(errorHandler).toHaveBeenCalled()
-        const message = errorHandler.mock.calls[0][0].message
-        expect(message).toContain("invalid access key")
-
-        done()
-      })
-  })
-
-  describe("fail", () => {
-    it("should send an error message with a mention if an invalid command is issued", done => {
-      axiosMock.onPost().reply(config => {
-        const content = JSON.parse(config.data).content
-        const root = HTMLParser.parse(content)
-        const attachment = root.querySelector("bc-attachment")
-
-        expect(content).toContain("unrecognized")
-        expect(attachment).toHaveProperty("attributes.sgid")
-        expect(attachment.attributes.sgid).toEqual(testSgid)
-
-        done()
-        return [201]
-      })
-
-      testCommand(0, "bogus command")
-    })
-  })
-
-  describe("help", () => {
-    it("should send a help message with a mention", done => {
-      axiosMock.onPost().reply(config => {
-        const content = JSON.parse(config.data).content
-        const root = HTMLParser.parse(content)
-        const attachment = root.querySelector("bc-attachment")
-
-        expect(content).toContain("help")
-        expect(attachment).toHaveProperty("attributes.sgid")
-        expect(attachment.attributes.sgid).toEqual(testSgid)
-
-        done()
-        return [201]
-      })
-
-      testCommand(0, "help")
-    })
-  })
-
-  describe("list", () => {
-    it("should return a list of subscribed repositories", done => {
-      axiosMock.onPost().reply(config => {
-        const content = JSON.parse(config.data).content
-        expect(content).toContain("repo-B")
-        expect(content).toContain("repo-C")
-
-        done()
-        return [201]
-      })
-
-      testCommand(1, "list")
-    })
-
-    it("should return the prepared message when no repositories are subscribed to", done => {
-      axiosMock.onPost().reply(config => {
-        const content = JSON.parse(config.data).content
-        expect(content).toEqual("list_empty")
-
-        done()
-        return [201]
-      })
-
-      testCommand(3, "list")
-    })
-  })
-
-  describe("subscribe", () => {
-    it("should successfully add a database entry", done => {
-      axiosMock.onPost().reply(requestConfig => {
-        const content = JSON.parse(requestConfig.data).content
-        expect(content).toEqual(
-          `subscribed:${config.github_organization}/repo-Z`
-        )
-        expect(database.getRepositoriesByChat(basecampChatUrl(4))).toEqual([
-          "repo-Z",
-        ])
-
-        done()
-        return [201]
-      })
-
-      expect(database.getRepositoriesByChat(basecampChatUrl(4))).toEqual([])
-      testCommand(4, "subscribe repo-Z")
-    })
-  })
-
-  describe("unsubscribe", () => {
-    it("should successfully remove database entry", done => {
-      axiosMock.onPost().reply(requestConfig => {
-        const content = JSON.parse(requestConfig.data).content
-        expect(content).toEqual(
-          `unsubscribed:${config.github_organization}/repo-B`
-        )
-        expect(
-          database.getRepositoriesByChat(basecampChatUrl(1))
-        ).not.toContain("repo-B")
-
-        done()
-        return [201]
-      })
-
-      expect(database.getRepositoriesByChat(basecampChatUrl(1))).toContain(
-        "repo-B"
-      )
-      testCommand(1, "unsubscribe repo-B")
-    })
-
-    it("should return the prepared message when the repository is not subscribed to", done => {
-      axiosMock.onPost().reply(config => {
-        const content = JSON.parse(config.data).content
-        const root = HTMLParser.parse(content)
-        const attachment = root.querySelector("bc-attachment")
-
-        expect(content).toContain("unsubscribe_fail")
-        expect(attachment).toHaveProperty("attributes.sgid")
-        expect(attachment.attributes.sgid).toEqual(testSgid)
-
-        expect(
-          database.getRepositoriesByChat(basecampChatUrl(0))
-        ).not.toContain("repo-B")
-
-        done()
-        return [201]
-      })
-
-      expect(database.getRepositoriesByChat(basecampChatUrl(0))).not.toContain(
-        "repo-B"
-      )
-      testCommand(0, "unsubscribe repo-B")
-    })
-  })
 })
 
 afterAll(() => {
   fs.unlinkSync("tests/data/database.json")
+})
+
+describe("POST /command", () => {
+  it("should do nothing with an invalid access key", async () => {
+    await request(server)
+      .post("/command")
+      .query({ access_key: "invalid-key" })
+      .expect(204)
+
+    expect(errorHandler).toHaveBeenCalled()
+    const message = errorHandler.mock.calls[0][0].message
+    expect(message).toContain("invalid access key")
+  })
+
+  describe("fail", () => {
+    it("should send an error message with a mention if an invalid command is issued", async () => {
+      const response = await testCommand(0, "bogus command")
+      expectMention(response.text)
+      expect(response.text).toContain("unrecognized")
+    })
+  })
+
+  describe("help", () => {
+    it("should send a help message with a mention", async () => {
+      const response = await testCommand(0, "help")
+      expectMention(response.text)
+      expect(response.text).toContain("help")
+    })
+  })
+
+  describe("list", () => {
+    it("should return a list of subscribed repositories", async () => {
+      const response = await testCommand(1, "list")
+      expect(response.text).toContain("repo-B")
+      expect(response.text).toContain("repo-C")
+    })
+
+    it("should return the prepared message when no repositories are subscribed to", async () => {
+      const response = await testCommand(3, "list")
+      expect(response.text).toEqual("list_empty")
+    })
+  })
+
+  describe("subscribe", () => {
+    it("should successfully add a database entry", async () => {
+      expect(database.getRepositoriesByChat(basecampChatUrl(4))).toEqual([])
+      const response = await testCommand(4, "subscribe repo-Z")
+      expect(response.text).toEqual(
+        `subscribed:${config.github_organization}/repo-Z`
+      )
+      expect(database.getRepositoriesByChat(basecampChatUrl(4))).toEqual([
+        "repo-Z",
+      ])
+    })
+  })
+
+  describe("unsubscribe", () => {
+    it("should successfully remove database entry", async () => {
+      expect(database.getRepositoriesByChat(basecampChatUrl(1))).toContain(
+        "repo-B"
+      )
+      const response = await testCommand(1, "unsubscribe repo-B")
+      expect(response.text).toEqual(
+        `unsubscribed:${config.github_organization}/repo-B`
+      )
+      expect(database.getRepositoriesByChat(basecampChatUrl(1))).not.toContain(
+        "repo-B"
+      )
+    })
+
+    it("should return the prepared message when the repository is not subscribed to", async () => {
+      expect(database.getRepositoriesByChat(basecampChatUrl(0))).not.toContain(
+        "repo-B"
+      )
+      const response = await testCommand(0, "unsubscribe repo-B")
+      expectMention(response.text)
+      expect(response.text).toContain("unsubscribe_fail")
+      expect(database.getRepositoriesByChat(basecampChatUrl(0))).not.toContain(
+        "repo-B"
+      )
+    })
+  })
 })

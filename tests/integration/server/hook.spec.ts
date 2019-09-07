@@ -7,6 +7,7 @@ import request from "supertest"
 import config from "@app/config"
 import server from "@app/server"
 import database from "@app/database"
+import { responses } from "@app/responses"
 
 jest.mock("@app/config", () => ({
   basecamp_access_key: "access-key",
@@ -50,115 +51,109 @@ beforeEach(() => {
   axiosMock.onPost().reply(201)
 })
 
+afterAll(() => {
+  fs.unlinkSync("tests/data/database.json")
+})
+
 describe("POST /hook", () => {
   describe("HMAC verification", () => {
-    it("should fail if no HMAC signature is supplied", done => {
-      testPayload("repo-A", "test_event_0", {})
+    it("should fail if no HMAC signature is supplied", async () => {
+      await testPayload("repo-A", "test_event_0", {})
         .unset("X-Hub-Signature")
-        .end((err, res) => {
-          expect(res.status).toBe(204)
-          expect(axiosMock.history.post).toHaveLength(0)
-          done()
-        })
+        .expect(responses.empty.code)
+
+      expect(axiosMock.history.post).toHaveLength(0)
     })
 
-    it("should fail if the HMAC signature does not match", done => {
-      testPayload("repo-A", "test_event_0", {})
+    it("should fail if the HMAC signature does not match", async () => {
+      await testPayload("repo-A", "test_event_0", {})
         .set("X-Hub-Signature", "mismatch")
-        .end((err, res) => {
-          expect(res.status).toBe(204)
-          expect(axiosMock.history.post).toHaveLength(0)
-          done()
-        })
+        .expect(responses.empty.code)
+
+      expect(axiosMock.history.post).toHaveLength(0)
     })
   })
 
-  it("should return 404 if Github event header is not present", done => {
-    testPayload("repo-A", "test_event_0", {})
+  it("should return 404 if Github event header is not present", async () => {
+    await testPayload("repo-A", "test_event_0", {})
       .unset("X-GitHub-Event")
-      .end((err, res) => {
-        expect(res.status).toBe(404)
-        expect(axiosMock.history.post).toHaveLength(0)
-        done()
-      })
+      .expect(responses.missing_event.code)
+
+    expect(axiosMock.history.post).toHaveLength(0)
   })
 
   describe("valid payloads", () => {
-    it("should notify the proper chats when called with a valid payload", done => {
-      testPayload("repo-A", "test_event_0", {}).end((err, res) => {
-        expect(res.status).toBe(204)
-        expect(axiosMock.history.post).toHaveLength(1)
+    it("should notify the proper chats when called with a valid payload", async () => {
+      await testPayload("repo-A", "test_event_0", {}).expect(
+        responses.event_handled.code
+      )
 
-        const data = JSON.parse(axiosMock.history.post[0].data)
-        expect(data.content).toEqual("test_event_0")
-        done()
-      })
+      expect(axiosMock.history.post).toHaveLength(1)
+      const data = JSON.parse(axiosMock.history.post[0].data)
+      expect(data.content).toEqual("test_event_0")
     })
 
-    it("should notify all subscribed chats when called with a valid payload", done => {
-      testPayload("repo-C", "test_event_0", {}).end((err, res) => {
-        expect(res.status).toBe(204)
-        expect(axiosMock.history.post).toHaveLength(2)
-        axiosMock.history.post.forEach(p => {
-          expect(JSON.parse(p.data).content).toEqual("test_event_0")
-        })
-        done()
+    it("should notify all subscribed chats when called with a valid payload", async () => {
+      await testPayload("repo-C", "test_event_0", {}).expect(
+        responses.event_handled.code
+      )
+
+      expect(axiosMock.history.post).toHaveLength(2)
+      axiosMock.history.post.forEach(p => {
+        expect(JSON.parse(p.data).content).toEqual("test_event_0")
       })
     })
   })
 
   describe("templates", () => {
-    it("should render properly (1)", done => {
+    it("should render properly (1)", async () => {
       const payload = {
         action: "action_0",
         property_0: "eggs",
         property_1: "ham",
       }
 
-      testPayload("repo-A", "test_event_1", payload).end((err, res) => {
-        expect(res.status).toBe(204)
-        expect(axiosMock.history.post).toHaveLength(1)
+      await testPayload("repo-A", "test_event_1", payload).expect(
+        responses.event_handled.code
+      )
 
-        const data = JSON.parse(axiosMock.history.post[0].data)
-        expect(data.content).toEqual("constant ham")
-        done()
-      })
+      expect(axiosMock.history.post).toHaveLength(1)
+      const data = JSON.parse(axiosMock.history.post[0].data)
+      expect(data.content).toEqual("constant ham")
     })
 
-    it("should render properly (2)", done => {
+    it("should render properly (2)", async () => {
       const payload = {
         action: "action_1",
         property_0: "eggs",
         property_1: "ham",
       }
 
-      testPayload("repo-A", "test_event_1", payload).end((err, res) => {
-        expect(res.status).toBe(204)
-        expect(axiosMock.history.post).toHaveLength(1)
+      await testPayload("repo-A", "test_event_1", payload).expect(
+        responses.event_handled.code
+      )
 
-        const data = JSON.parse(axiosMock.history.post[0].data)
-        expect(data.content).toEqual("eggs")
-        done()
-      })
+      expect(axiosMock.history.post).toHaveLength(1)
+      const data = JSON.parse(axiosMock.history.post[0].data)
+      expect(data.content).toEqual("eggs")
     })
 
-    it("should fail when no action matches", done => {
+    it("should fail when no action matches", async () => {
       const payload = {
         action: "action_bogus",
         property_0: "eggs",
         property_1: "ham",
       }
 
-      testPayload("repo-A", "test_event_1", payload).end((err, res) => {
-        expect(res.status).toBe(404)
-        expect(axiosMock.history.post).toHaveLength(0)
-        done()
-      })
+      await testPayload("repo-A", "test_event_1", payload).expect(
+        responses.translation_error.code
+      )
+      expect(axiosMock.history.post).toHaveLength(0)
     })
   })
 
   describe("handled events", () => {
-    it("should rename repositories in the database", done => {
+    it("should rename repositories in the database", async () => {
       expect(database.getChatsByRepository("repo-A")).toHaveLength(1)
       expect(database.getChatsByRepository("repo-A-new")).toHaveLength(0)
 
@@ -168,24 +163,16 @@ describe("POST /hook", () => {
           repository: { name: { from: "repo-A" } },
         },
       }
-      testPayload("repo-A-new", "repository", payload).end(() => {
-        expect(database.getChatsByRepository("repo-A")).toHaveLength(0)
-        expect(database.getChatsByRepository("repo-A-new")).toHaveLength(1)
-        done()
-      })
+
+      await testPayload("repo-A-new", "repository", payload)
+      expect(database.getChatsByRepository("repo-A")).toHaveLength(0)
+      expect(database.getChatsByRepository("repo-A-new")).toHaveLength(1)
     })
 
-    it("should delete repositories in the database", done => {
+    it("should delete repositories in the database", async () => {
       expect(database.getChatsByRepository("repo-A")).toHaveLength(1)
-
-      testPayload("repo-A", "repository", { action: "deleted" }).end(() => {
-        expect(database.getChatsByRepository("repo-A")).toHaveLength(0)
-        done()
-      })
+      await testPayload("repo-A", "repository", { action: "deleted" })
+      expect(database.getChatsByRepository("repo-A")).toHaveLength(0)
     })
   })
-})
-
-afterAll(() => {
-  fs.unlinkSync("tests/data/database.json")
 })
