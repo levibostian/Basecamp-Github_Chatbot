@@ -1,6 +1,6 @@
 const fs = require("fs")
 
-import database, { ChatStore } from "@app/database"
+import { ChatStore } from "@app/database"
 
 jest.mock("@app/config", () => ({
   data_directory: "tmp",
@@ -15,10 +15,6 @@ jest.mock("fs", () => ({
 const databaseFile = "test-database.json"
 
 function prepareMockDatabaseFile(content?: string) {
-  fs.existsSync.mockClear()
-  fs.readFileSync.mockClear()
-  fs.writeFileSync.mockClear()
-
   if (content) {
     fs.existsSync.mockReturnValue(true)
     fs.readFileSync.mockReturnValue(content)

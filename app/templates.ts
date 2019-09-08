@@ -41,6 +41,8 @@ export interface GithubPayload {
   }
 }
 
+export class TranslationError extends Error {}
+
 export function TranslateGithubPayload(
   event: string,
   payload: GithubPayload
@@ -48,7 +50,7 @@ export function TranslateGithubPayload(
   const translation = templates.notifications[event]
 
   if (!translation) {
-    throw Error(
+    throw new TranslationError(
       `Could not find event "${event}" in your templates. If you wish to avoid this error, modify your organization webhook settings or add support in templates.json`
     )
   }
@@ -59,7 +61,7 @@ export function TranslateGithubPayload(
   }
 
   if (!(eventAction in translation.actions)) {
-    throw Error(
+    throw new TranslationError(
       `could not find template for action "${eventAction}" in event "${event}" in templates.json.`
     )
   }

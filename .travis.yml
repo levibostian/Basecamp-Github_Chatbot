@@ -14,23 +14,14 @@ env:
   global:
     - SERVER_PORT=3000
 
+jobs:
+  include:
+    - stage: tests
+      script:
+        - npm run lint
+        - npm run test:unit
+        - bash scripts/test-docker-image.sh
 
-before_script:
-  - docker build -t basecamp-github-chatbot:test -f docker/Dockerfile-app.hub .
-  - docker run -d -p ${SERVER_PORT}:${SERVER_PORT} --name chatbot-test --env-file=.env.test basecamp-github-chatbot:test
-script:
-  - npm run lint
-  - sleep 5
-  - docker ps
-  - docker logs chatbot-test
-  - >
-    RETRIES=10;
-    TIMEOUT=1;
-    while [[ true ]]; do
-      echo "Waiting for response from server... $RETRIES";
-      sleep $TIMEOUT;
-      curl -sS -X POST http://localhost:${SERVER_PORT}/hook;
-      if [[ "$?" = "0" ]]; then echo "Server responded!"; break; fi;
-      if [[ "$RETRIES" -le "0" ]]; then echo "Failed to contact server."; exit 1; break; fi;
-      ((RETRIES--));
-    done;
+stages:
+  - name: tests 
+    if: type IN (pull_request, push) AND tag IS blank

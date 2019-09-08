@@ -13,8 +13,8 @@
     "production:run": "docker-compose -f docker/docker-compose.yml -f docker/docker-compose.prod.override.yml up",
     "test": "concurrently --names \"unit,integration\" -s \"all\" -c \"blue,green\" \"npm run test:unit\" \"npm run test:integration\"",
     "test:unit": "NODE_ENV=test jest --testPathPattern=\".+tests/unit/.+.spec.ts\"",
-    "test:integration": "NODE_ENV=test jest --testPathPattern=\".+tests/integration/.+.spec.ts\"",
-    "lint": "npx eslint app/**/*.ts",
+    "test:integration": "NODE_ENV=test jest --testPathPattern=\".+tests/integration/.+.spec.ts\" --runInBand",
+    "lint": "npx eslint --max-warnings 0 app/**/*.ts",
     "format": "npx prettier --write \"{app,tests}/**/*.ts\""
   },
   "repository": {
@@ -76,16 +76,13 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "npm run lint && lint-staged"
     }
   },
   "lint-staged": {
-    "app/**/*.ts": [
-        "npx eslint"
-    ],
     "*.ts": [
       "npm run format",
-      "git add"  
+      "git add"
     ]
   }
 }

@@ -73,8 +73,7 @@ export class ChatStore {
 
     if (chat && !chat.repositories.includes(repo)) {
       chat.repositories.push(repo)
-    } else {
-      // TODO: Oh no! what if chat && chat.repos.includes()???
+    } else if (!chat) {
       this.chats.push({
         chat_url: chatUrl,
         repositories: [repo],
