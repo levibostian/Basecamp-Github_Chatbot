@@ -2,6 +2,7 @@
 .config
 .env
 .npm
+coverage
 database.json
 dist
 error.log

@@ -3,40 +3,38 @@ import path from "path"
 
 import config from "@app/config"
 
-type Chat = {
+interface Chat {
   chat_url: string
   repositories: string[]
 }
 
-const ENCODING = "utf8"
-const STORE_FILE = path.join(config.data_directory, "database.json")
-
-class ChatStore {
+export class ChatStore {
   private chats: Chat[]
 
-  public constructor() {
-    this.chats = this.readFile()
+  public constructor(private file: string) {
+    this.chats = []
+    this.reload()
   }
 
   private saveFile(): void {
-    fs.promises
-      .writeFile(STORE_FILE, JSON.stringify(this.chats), ENCODING)
-      .catch(err => {
-        throw Error(
-          `unable to save database, error writing to ${STORE_FILE}\n${err}\n${
-            err.stack
-          }`
-        )
-      })
+    try {
+      fs.writeFileSync(this.file, JSON.stringify(this.chats), "utf8")
+    } catch (err) {
+      throw Error(
+        `unable to save database, error writing to ${this.file}\n${err}\n${
+          err.stack
+        }`
+      )
+    }
   }
 
-  private readFile(): Chat[] {
+  public reload(): void {
     // Empty/new database
-    if (!fs.existsSync(STORE_FILE)) {
-      return []
+    if (!fs.existsSync(this.file)) {
+      this.chats = []
+    } else {
+      this.chats = JSON.parse(fs.readFileSync(this.file, "utf8"))
     }
-
-    return JSON.parse(fs.readFileSync(STORE_FILE, ENCODING))
   }
 
   /* Get a subscription from a chat callback URL */
@@ -48,6 +46,13 @@ class ChatStore {
   public getRepositoriesByChat(chatUrl: string): string[] {
     const chat = this.getChat(chatUrl)
     return chat ? chat.repositories : []
+  }
+
+  /* Return chat callback URLs for all chats subscribed to given repo */
+  public getChatsByRepository(repo: string): string[] {
+    return this.chats
+      .filter(s => s.repositories.includes(repo))
+      .map(s => s.chat_url)
   }
 
   /* Change the name of a repository */
@@ -62,13 +67,6 @@ class ChatStore {
     this.saveFile()
   }
 
-  /* Return chat callback URLs for all chats subscribed to given repo */
-  public getChatsByRepository(repo: string): string[] {
-    return this.chats
-      .filter(s => s.repositories.includes(repo))
-      .map(s => s.chat_url)
-  }
-
   /* Add a repo to a chat's subscriptions */
   public addRepositoryToChat(repo: string, chatUrl: string): void {
     const chat = this.getChat(chatUrl)
@@ -76,6 +74,7 @@ class ChatStore {
     if (chat && !chat.repositories.includes(repo)) {
       chat.repositories.push(repo)
     } else {
+      // TODO: Oh no! what if chat && chat.repos.includes()???
       this.chats.push({
         chat_url: chatUrl,
         repositories: [repo],
@@ -85,8 +84,8 @@ class ChatStore {
     this.saveFile()
   }
 
-  public removeRepositoryFromChat(repo: string, charUrl: string): void {
-    const chat = this.getChat(charUrl)
+  public removeRepositoryFromChat(repo: string, chatUrl: string): void {
+    const chat = this.getChat(chatUrl)
 
     if (chat) {
       chat.repositories = chat.repositories.filter(r => r !== repo)
@@ -99,9 +98,11 @@ class ChatStore {
     this.chats.forEach(
       chat => (chat.repositories = chat.repositories.filter(r => r !== repo))
     )
+    this.saveFile()
   }
 }
 
 // Single instance
-const database = new ChatStore()
+const STORE_FILE = path.join(config.data_directory, "database.json")
+const database = new ChatStore(STORE_FILE)
 export default database

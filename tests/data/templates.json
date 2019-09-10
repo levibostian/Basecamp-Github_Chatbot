@@ -1,0 +1,29 @@
+{
+    "responses": {
+        "help": "help",
+        "list_repos": "<% repositories.forEach(s => { %><%= s %><% }); %>",
+        "list_empty": "list_empty",
+        "subscribe": "subscribed:<%= organization %>/<%= repo %>",
+        "unrecognized": "unrecognized",
+        "unsubscribe": "unsubscribed:<%= organization %>/<%= repo %>",
+        "unsubscribe_fail": "unsubscribe_fail"
+    },
+    "notifications": {
+        "test_event_0": {
+            "templates": {},
+            "actions": {
+                "default": "test_event_0"
+            }
+        },
+        "test_event_1": {
+            "templates": {
+                "test_template_0": "constant",
+                "test_template_1": "<%= property_0 %>"
+            },
+            "actions": {
+                "action_0": "<%- test_template_0 %> <%= property_1 %>",
+                "action_1": "<%- test_template_1 %>"
+            }
+        }
+    }    
+}

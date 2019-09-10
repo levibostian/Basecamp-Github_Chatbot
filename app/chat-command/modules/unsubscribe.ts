@@ -1,33 +1,29 @@
 import ejs from "ejs"
 
-import db from "@app/database"
-
-import { SendBasecampChat } from "@app/basecamp-chat"
 import config from "@app/config"
+import db from "@app/database"
 import { CommandResponses } from "@app/templates"
-import { ChatCommandArguments } from ".."
+import { ChatCommandContext } from ".."
 
 export const command = "unsubscribe <repo>"
 export const describe = ""
 export const builder = {}
 
-export function handler(args: ChatCommandArguments): void {
-  const repositories = db.getRepositoriesByChat(args.responseUrl)
+export function handler(context: ChatCommandContext): void {
+  const repositories = db.getRepositoriesByChat(context.chatUrl)
 
-  if (repositories.includes(args.repo)) {
-    db.removeRepositoryFromChat(args.repo, args.responseUrl)
-    SendBasecampChat(
-      args.responseUrl,
+  if (repositories.includes(context.repo)) {
+    db.removeRepositoryFromChat(context.repo, context.chatUrl)
+    context.respond(
       ejs.render(CommandResponses.unsubscribe, {
-        repo: args.repo,
+        repo: context.repo,
         organization: config.github_organization,
       })
     )
   } else {
-    SendBasecampChat(
-      args.responseUrl,
-      ejs.render(CommandResponses.unsubscribe_fail, { repo: args.repo }),
-      args.userId // this is an error, so @creator
+    context.respond(
+      ejs.render(CommandResponses.unsubscribe_fail, { repo: context.repo }),
+      true
     )
   }
 }
