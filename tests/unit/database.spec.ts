@@ -1,7 +1,5 @@
 import { Chat, ChatStore, StorageEngine } from "@app/database"
 
-jest.mock("@app/config", () => ({}))
-
 class MockStorageEngine implements StorageEngine {
   public write: (chats: Chat[]) => void
   public read: () => Chat[]
