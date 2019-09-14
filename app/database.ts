@@ -38,10 +38,14 @@ class AppStorageEngine implements StorageEngine {
 }
 
 export class ChatStore {
-  private chats: Chat[]
+  private chats: Chat[] = []
 
   public constructor(private storageEngine: StorageEngine) {
-    this.chats = storageEngine.read()
+    this.load()
+  }
+
+  public load(): void {
+    this.chats = this.storageEngine.read()
   }
 
   private save(): void {
