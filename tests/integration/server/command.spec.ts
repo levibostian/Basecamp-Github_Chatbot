@@ -48,7 +48,7 @@ server.use(errorHandler)
 
 beforeEach(() => {
   fs.copyFileSync("tests/data/database.test.json", "tests/data/database.json")
-  database.reload()
+  database.load()
 
   errorHandler.mockClear()
 })

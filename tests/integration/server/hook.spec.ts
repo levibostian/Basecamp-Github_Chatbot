@@ -44,7 +44,7 @@ const axiosMock = new MockAdapter(axios)
 
 beforeEach(() => {
   fs.copyFileSync("tests/data/database.test.json", "tests/data/database.json")
-  database.reload()
+  database.load()
 
   axiosMock.reset()
   axiosMock.resetHistory()

@@ -35,30 +35,36 @@ function mentionBasecampUser(message: string, userId: string): string {
 export function ParseBasecampPayload(
   payload: BasecampCommandPayload
 ): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const validator = new Validator()
-    if (!validator.validate(payload, BasecampCommandPayloadSchema).valid) {
-      reject(Error("invalid Basecamp payload schema"))
-    }
-
-    const userId = payload.creator.attachable_sgid
-    const context = {
-      chatUrl: payload.callback_url,
-      respond: (response: string, mention?: boolean) => {
-        if (mention) {
-          resolve(mentionBasecampUser(response, userId))
-        } else {
-          resolve(response)
-        }
-      },
-    }
-
-    // Split on ALL whitespace
-    const args: string[] = payload.command.match(/\S+/g) || []
-    ChatCommandParser.parse(args, context, err => {
-      if (err) {
-        resolve(mentionBasecampUser(CommandResponses.unrecognized, userId))
+  return new Promise(
+    (resolve, reject): void => {
+      const validator = new Validator()
+      if (!validator.validate(payload, BasecampCommandPayloadSchema).valid) {
+        reject(Error("invalid Basecamp payload schema"))
       }
-    })
-  })
+
+      const userId = payload.creator.attachable_sgid
+      const context = {
+        chatUrl: payload.callback_url,
+        respond: (response: string, mention?: boolean): void => {
+          if (mention) {
+            resolve(mentionBasecampUser(response, userId))
+          } else {
+            resolve(response)
+          }
+        },
+      }
+
+      // Split on ALL whitespace
+      const args: string[] = payload.command.match(/\S+/g) || []
+      ChatCommandParser.parse(
+        args,
+        context,
+        (err): void => {
+          if (err) {
+            resolve(mentionBasecampUser(CommandResponses.unrecognized, userId))
+          }
+        }
+      )
+    }
+  )
 }

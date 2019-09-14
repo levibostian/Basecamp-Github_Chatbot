@@ -3,22 +3,30 @@ import path from "path"
 
 import config from "@app/config"
 
-interface Chat {
+export interface Chat {
   chat_url: string
   repositories: string[]
 }
 
-export class ChatStore {
-  private chats: Chat[]
+export interface StorageEngine {
+  read: () => Chat[]
+  write: (chats: Chat[]) => void
+}
 
-  public constructor(private file: string) {
-    this.chats = []
-    this.reload()
+class AppStorageEngine implements StorageEngine {
+  public constructor(private file: string) {}
+
+  public read(): Chat[] {
+    if (!fs.existsSync(this.file)) {
+      return []
+    } else {
+      return JSON.parse(fs.readFileSync(this.file, "utf8"))
+    }
   }
 
-  private saveFile(): void {
+  public write(chats: Chat[]): void {
     try {
-      fs.writeFileSync(this.file, JSON.stringify(this.chats), "utf8")
+      fs.writeFileSync(this.file, JSON.stringify(chats), "utf8")
     } catch (err) {
       throw Error(
         `unable to save database, error writing to ${this.file}\n${err}\n${
@@ -27,14 +35,21 @@ export class ChatStore {
       )
     }
   }
+}
 
-  public reload(): void {
-    // Empty/new database
-    if (!fs.existsSync(this.file)) {
-      this.chats = []
-    } else {
-      this.chats = JSON.parse(fs.readFileSync(this.file, "utf8"))
-    }
+export class ChatStore {
+  private chats!: Chat[]
+
+  public constructor(private storageEngine: StorageEngine) {
+    this.load()
+  }
+
+  public load(): void {
+    this.chats = this.storageEngine.read()
+  }
+
+  private save(): void {
+    this.storageEngine.write(this.chats)
   }
 
   /* Get a subscription from a chat callback URL */
@@ -64,7 +79,7 @@ export class ChatStore {
       }
     })
 
-    this.saveFile()
+    this.save()
   }
 
   /* Add a repo to a chat's subscriptions */
@@ -72,16 +87,17 @@ export class ChatStore {
     const chat = this.getChat(chatUrl)
 
     if (chat && !chat.repositories.includes(repo)) {
+      // Add repo to chat if chat already exists in db
       chat.repositories.push(repo)
-    } else {
-      // TODO: Oh no! what if chat && chat.repos.includes()???
+    } else if (!chat) {
+      // If the chat isn't in db, add chat with this repo
       this.chats.push({
         chat_url: chatUrl,
         repositories: [repo],
       })
     }
 
-    this.saveFile()
+    this.save()
   }
 
   public removeRepositoryFromChat(repo: string, chatUrl: string): void {
@@ -91,18 +107,18 @@ export class ChatStore {
       chat.repositories = chat.repositories.filter(r => r !== repo)
     }
 
-    this.saveFile()
+    this.save()
   }
 
   public deleteRepository(repo: string) {
     this.chats.forEach(
       chat => (chat.repositories = chat.repositories.filter(r => r !== repo))
     )
-    this.saveFile()
+    this.save()
   }
 }
 
 // Single instance
 const STORE_FILE = path.join(config.data_directory, "database.json")
-const database = new ChatStore(STORE_FILE)
+const database = new ChatStore(new AppStorageEngine(STORE_FILE))
 export default database

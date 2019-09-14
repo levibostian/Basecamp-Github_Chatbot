@@ -15,7 +15,7 @@ import {
 declare global {
   namespace Express {
     export interface Request {
-      hmac_verified: boolean
+      hmacVerified: boolean
     }
   }
 }
@@ -40,18 +40,22 @@ function dispatchMessages(event: string, payload: GithubPayload): void {
   }
 
   const message = TranslateGithubPayload(event, payload)
-  db.getChatsByRepository(repo).forEach(chatUrl =>
-    axios
-      .post(
-        chatUrl,
-        { content: message },
-        { headers: { "User-Agent": config.basecamp_user_agent } }
-      )
-      .catch(err => {
-        throw Error(
-          `Failed to POST ${message} to ${chatUrl}\n${err}\n${err.stack}`
+  db.getChatsByRepository(repo).forEach(
+    (chatUrl): void => {
+      axios
+        .post(
+          chatUrl,
+          { content: message },
+          { headers: { "User-Agent": config.basecamp_user_agent } }
         )
-      })
+        .catch(
+          (err): void => {
+            throw Error(
+              `Failed to POST ${message} to ${chatUrl}\n${err}\n${err.stack}`
+            )
+          }
+        )
+    }
   )
 }
 
@@ -63,7 +67,7 @@ export function VerifyGithubHMAC(
 ): void {
   const senderSignature = req.header("X-Hub-Signature")
   if (!senderSignature) {
-    req.hmac_verified = false
+    req.hmacVerified = false
     return
   }
 
@@ -71,7 +75,7 @@ export function VerifyGithubHMAC(
   const hmac = crypto.createHmac("sha1", config.github_hmac_secret)
   const signature = "sha1=" + hmac.update(body).digest("hex")
 
-  req.hmac_verified = signature === senderSignature
+  req.hmacVerified = signature === senderSignature
 }
 
 export function GithubWebhook(
@@ -80,7 +84,7 @@ export function GithubWebhook(
   next: NextFunction
 ): void {
   // Ensure the request came from Github
-  if (!req.hmac_verified) {
+  if (!req.hmacVerified) {
     sendResponse(res, responses.empty)
     return next(
       Error(
