@@ -38,7 +38,7 @@ class AppStorageEngine implements StorageEngine {
 }
 
 export class ChatStore {
-  private chats: Chat[] = []
+  private chats!: Chat[]
 
   public constructor(private storageEngine: StorageEngine) {
     this.load()
