@@ -80,6 +80,9 @@
     }
   },
   "lint-staged": {
+    "app/**/*.ts": [
+      "npx eslint"
+    ],
     "*.ts": [
       "npm run format",
       "git add"

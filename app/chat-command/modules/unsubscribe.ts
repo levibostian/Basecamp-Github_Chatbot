@@ -22,9 +22,7 @@ export function handler(context: ChatCommandContext): void {
     )
   } else {
     context.respond(
-      ejs.render(CommandResponses.unsubscribe_fail, {
-        repo: context.repo,
-      }),
+      ejs.render(CommandResponses.unsubscribe_fail, { repo: context.repo }),
       true
     )
   }

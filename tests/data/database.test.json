@@ -1,0 +1,22 @@
+[
+    {
+        "chat_url": "https://3.basecamp.com/0/integrations/a/buckets/0/chats/0/lines",
+        "repositories": [
+            "repo-A"
+        ]
+    }, {
+        "chat_url": "https://3.basecamp.com/0/integrations/a/buckets/0/chats/1/lines",
+        "repositories": [
+            "repo-B",
+            "repo-C"
+        ]
+    }, {
+        "chat_url": "https://3.basecamp.com/0/integrations/a/buckets/0/chats/2/lines",
+        "repositories": [
+            "repo-C"
+        ]
+    }, {
+        "chat_url": "https://3.basecamp.com/0/integrations/a/buckets/0/chats/3/lines",
+        "repositories": []
+    }
+]
