@@ -1,23 +1,18 @@
 import ejs from "ejs"
 
 import db from "@app/database"
-
-import { SendBasecampChat } from "@app/basecamp-chat"
 import { CommandResponses } from "@app/templates"
-import { ChatCommandArguments } from ".."
+import { ChatCommandContext } from ".."
 
 export const command = "list"
 export const describe = ""
 export const builder = {}
 
-export function handler(args: ChatCommandArguments): void {
-  const repositories = db.getRepositoriesByChat(args.responseUrl)
+export function handler(context: ChatCommandContext): void {
+  const repositories = db.getRepositoriesByChat(context.chatUrl)
   if (repositories.length) {
-    SendBasecampChat(
-      args.responseUrl,
-      ejs.render(CommandResponses.list_repos, { repositories })
-    )
+    context.respond(ejs.render(CommandResponses.list_repos, { repositories }))
   } else {
-    SendBasecampChat(args.responseUrl, CommandResponses.list_empty)
+    context.respond(CommandResponses.list_empty)
   }
 }

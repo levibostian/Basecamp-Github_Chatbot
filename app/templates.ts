@@ -6,7 +6,7 @@ import config from "@app/config"
 
 const TEMPLATE_FILE = "templates.json"
 const defaultPath = TEMPLATE_FILE
-const userTemplatePath = path.join(config.data_directory, "templates.json")
+const userTemplatePath = path.join(config.data_directory, TEMPLATE_FILE)
 
 const templatePath = fs.existsSync(userTemplatePath)
   ? userTemplatePath
@@ -32,7 +32,7 @@ const templates: {
 
 export const CommandResponses = templates.responses
 
-export type GithubPayload = {
+export interface GithubPayload {
   [key: string]: any
 
   action: string
@@ -41,6 +41,8 @@ export type GithubPayload = {
   }
 }
 
+export class TranslationError extends Error {}
+
 export function TranslateGithubPayload(
   event: string,
   payload: GithubPayload
@@ -48,18 +50,18 @@ export function TranslateGithubPayload(
   const translation = templates.notifications[event]
 
   if (!translation) {
-    throw Error(
+    throw new TranslationError(
       `Could not find event "${event}" in your templates. If you wish to avoid this error, modify your organization webhook settings or add support in templates.json`
     )
   }
 
-  let eventAction: string = "default"
+  let eventAction = "default"
   if ("action" in payload && payload.action in translation.actions) {
     eventAction = payload.action
   }
 
   if (!(eventAction in translation.actions)) {
-    throw Error(
+    throw new TranslationError(
       `could not find template for action "${eventAction}" in event "${event}" in templates.json.`
     )
   }

@@ -1,7 +1,7 @@
 import { Validator } from "jsonschema"
 import yargs from "yargs"
 
-import { SendBasecampDefaultError } from "@app/basecamp-chat"
+import { CommandResponses } from "@app/templates"
 
 import BasecampCommandPayloadSchema from "./basecamp-payload.schema.json"
 import * as commands from "./modules"
@@ -14,10 +14,10 @@ interface BasecampCommandPayload {
   callback_url: string
 }
 
-export interface ChatCommandArguments {
-  userId: string
-  responseUrl: string
-  [key: string]: string
+export interface ChatCommandContext {
+  respond: (response: string, mention?: boolean) => void
+  chatUrl: string
+  repo: string
 }
 
 const ChatCommandParser = yargs
@@ -28,23 +28,43 @@ const ChatCommandParser = yargs
   .command(commands.list)
   .help(false)
 
-export async function ParseBasecampPayload(
+function mentionBasecampUser(message: string, userId: string): string {
+  return `<bc-attachment sgid="${userId}"></bc-attachment>, ${message}`
+}
+
+export function ParseBasecampPayload(
   payload: BasecampCommandPayload
-): Promise<void> {
-  const validator = new Validator()
-  if (!validator.validate(payload, BasecampCommandPayloadSchema).valid) {
-    return
-  }
+): Promise<string> {
+  return new Promise(
+    (resolve, reject): void => {
+      const validator = new Validator()
+      if (!validator.validate(payload, BasecampCommandPayloadSchema).valid) {
+        reject(Error("invalid Basecamp payload schema"))
+      }
 
-  const command: string = payload.command
-  const userId: string = payload.creator.attachable_sgid
-  const responseUrl: string = payload.callback_url
+      const userId = payload.creator.attachable_sgid
+      const context = {
+        chatUrl: payload.callback_url,
+        respond: (response: string, mention?: boolean): void => {
+          if (mention) {
+            resolve(mentionBasecampUser(response, userId))
+          } else {
+            resolve(response)
+          }
+        },
+      }
 
-  // Split on ALL whitespace
-  const args: string[] = command.match(/\S+/g) || []
-  ChatCommandParser.parse(args, { responseUrl, userId }, err => {
-    if (err) {
-      SendBasecampDefaultError(responseUrl, userId)
+      // Split on ALL whitespace
+      const args: string[] = payload.command.match(/\S+/g) || []
+      ChatCommandParser.parse(
+        args,
+        context,
+        (err): void => {
+          if (err) {
+            resolve(mentionBasecampUser(CommandResponses.unrecognized, userId))
+          }
+        }
+      )
     }
-  })
+  )
 }

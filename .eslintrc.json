@@ -16,6 +16,7 @@
         "@typescript-eslint/indent": "off",
         "@typescript-eslint/member-delimiter-style": "none",
         "@typescript-eslint/no-namespace": "off",
-        "@typescript-eslint/camelcase": "warn"
+        "@typescript-eslint/camelcase": "warn",
+        "@typescript-eslint/no-parameter-properties": "off"
     }
 }

@@ -1,16 +1,21 @@
+import axios from "axios"
 import crypto from "crypto"
 import { NextFunction, Request, Response } from "express"
 
-import { SendBasecampChat } from "@app/basecamp-chat"
 import config from "@app/config"
 import db from "@app/database"
-import { GithubPayload, TranslateGithubPayload } from "@app/templates"
+import { responses, sendResponse } from "@app/responses"
+import {
+  GithubPayload,
+  TranslateGithubPayload,
+  TranslationError,
+} from "@app/templates"
 
 /* Add the hmac_verified property to Request objects */
 declare global {
   namespace Express {
     export interface Request {
-      hmac_verified: boolean
+      hmacVerified: boolean
     }
   }
 }
@@ -35,8 +40,22 @@ function dispatchMessages(event: string, payload: GithubPayload): void {
   }
 
   const message = TranslateGithubPayload(event, payload)
-  db.getChatsByRepository(repo).forEach(chatUrl =>
-    SendBasecampChat(chatUrl, message)
+  db.getChatsByRepository(repo).forEach(
+    (chatUrl): void => {
+      axios
+        .post(
+          chatUrl,
+          { content: message },
+          { headers: { "User-Agent": config.basecamp_user_agent } }
+        )
+        .catch(
+          (err): void => {
+            throw Error(
+              `Failed to POST ${message} to ${chatUrl}\n${err}\n${err.stack}`
+            )
+          }
+        )
+    }
   )
 }
 
@@ -48,7 +67,7 @@ export function VerifyGithubHMAC(
 ): void {
   const senderSignature = req.header("X-Hub-Signature")
   if (!senderSignature) {
-    req.hmac_verified = false
+    req.hmacVerified = false
     return
   }
 
@@ -56,7 +75,7 @@ export function VerifyGithubHMAC(
   const hmac = crypto.createHmac("sha1", config.github_hmac_secret)
   const signature = "sha1=" + hmac.update(body).digest("hex")
 
-  req.hmac_verified = signature === senderSignature
+  req.hmacVerified = signature === senderSignature
 }
 
 export function GithubWebhook(
@@ -65,31 +84,39 @@ export function GithubWebhook(
   next: NextFunction
 ): void {
   // Ensure the request came from Github
-  if (!req.hmac_verified) {
-    res.status(204).send()
-    throw Error(
-      "Attempted access to /hook with invalid signature: " +
-        req.connection.remoteAddress
+  if (!req.hmacVerified) {
+    sendResponse(res, responses.empty)
+    return next(
+      Error(
+        "Attempted access to /hook with invalid signature: " +
+          req.connection.remoteAddress
+      )
     )
   }
 
   // Custom header set by GithHub to distinguish between events
   const event = req.header("X-GitHub-Event")
   if (!event) {
-    res.status(404).send()
-    throw Error(
-      "Event header missing from request to /hook: " +
-        req.connection.remoteAddress
+    sendResponse(res, responses.missing_event)
+    return next(
+      Error(
+        "Event header missing from request to /hook: " +
+          req.connection.remoteAddress
+      )
     )
   }
 
   try {
     dispatchMessages(event, req.body)
+    sendResponse(res, responses.event_handled)
   } catch (err) {
-    res.status(404).send()
-    throw err
+    if (err instanceof TranslationError) {
+      sendResponse(res, responses.translation_error)
+    } else {
+      sendResponse(res, responses.basecamp_post_failed)
+    }
+    return next(err)
   }
 
-  res.status(204).send()
   next()
 }
