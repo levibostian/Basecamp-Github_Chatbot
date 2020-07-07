@@ -3,7 +3,7 @@
 # Retry interval in seconds
 TIMEOUT=1
 
-docker build -t basecamp-github-chatbot:test -f docker/Dockerfile-app.hub .
+docker build -t basecamp-github-chatbot:test -f docker/production/Dockerfile .
 docker run -d -p ${SERVER_PORT}:${SERVER_PORT} --name chatbot-test --env-file=.env.test basecamp-github-chatbot:test
 sleep 5
 docker ps
