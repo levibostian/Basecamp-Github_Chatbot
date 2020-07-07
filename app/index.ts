@@ -11,7 +11,7 @@ function beforeShutdown(): Promise<void> {
 
 const terminusOptions: TerminusOptions = {
   healthChecks: {
-    "/healthCheck": database.check,
+    "/healthCheck": database.check.bind(database),
   },
   beforeShutdown,
   logger: console.log,

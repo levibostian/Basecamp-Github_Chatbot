@@ -1,6 +1,6 @@
 {
     "name": "basecamp-github-chatbot",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "A more advanced Basecamp chatbot to integrate GitHub and Basecamp",
     "main": "index.js",
     "scripts": {
