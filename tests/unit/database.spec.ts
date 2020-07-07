@@ -5,10 +5,12 @@ jest.mock("@app/config", () => ({
 }))
 
 class MockStorageEngine implements StorageEngine {
+  public check: () => Promise<void>
   public write: (chats: Chat[]) => Promise<void>
   public read: () => Promise<Chat[]>
 
   public constructor(chats?: Chat[]) {
+    this.check = jest.fn()
     this.write = jest.fn()
     this.read = jest.fn().mockResolvedValue(chats ? chats : [])
   }

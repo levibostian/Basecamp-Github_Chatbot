@@ -102,7 +102,7 @@ export class ChatStore {
         (chat) =>
           (chat.repositories = chat.repositories.filter((r) => r !== repo))
       )
-      .catch(undefined)
+      .catch(() => undefined)
     await this.save()
   }
 

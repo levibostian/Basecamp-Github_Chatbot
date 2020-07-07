@@ -25,7 +25,8 @@ const templates: {
 export const CommandResponses = templates.responses
 
 export interface GithubPayload {
-  [key: string]: unknown
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
 
   action: string
   repository: {
