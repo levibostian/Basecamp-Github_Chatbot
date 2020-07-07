@@ -1,27 +1,33 @@
 language: node_js
 node_js:
-  - "10"
+- "10"
 sudo: required
 services:
-  - docker
+- docker
 
 addons:
   apt:
     packages:
-      - docker-ce
+    - docker-ce
 
 env:
   global:
-    - SERVER_PORT=3000
+  - SERVER_PORT=3000
+  - DOCKER_REPO=docker.pkg.github.com/foundersclubsoftware/basecamp-github_chatbot/alpine
 
 jobs:
   include:
-    - stage: tests
-      script:
-        - npm run lint
-        - npm test
-        - bash scripts/test-docker-image.sh
+  - stage: tests
+    script:
+    - npm run lint
+    - npm test
+    - bash scripts/test-docker-image.sh
+  - stage: image-deploy
+    script:
+    - bash scripts/deploy-docker-image.sh
 
 stages:
-  - name: tests 
-    if: type IN (pull_request, push) AND tag IS blank
+- name: tests 
+  if: type IN (pull_request, push) AND tag IS blank
+- name: image-deploy
+  if: type IN (pull_request, push)
