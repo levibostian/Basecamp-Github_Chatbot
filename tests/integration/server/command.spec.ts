@@ -11,7 +11,8 @@ jest.mock("@app/config", () => ({
   basecamp_access_key: "access-key",
   basecamp_user_agent: "test-ua",
   github_organization: "test-org",
-  data_directory: "tests/data",
+  template_file: "tests/data/templates.json",
+  database_file: "tests/data/database.json",
 }))
 
 const testSgid = "--0000000000000000000000000000000000c0ffee"
@@ -100,12 +101,14 @@ describe("POST /command", () => {
 
   describe("subscribe", () => {
     it("should successfully add a database entry", async () => {
-      expect(database.getRepositoriesByChat(basecampChatUrl(4))).toEqual([])
+      expect(await database.getRepositoriesByChat(basecampChatUrl(4))).toEqual(
+        []
+      )
       const response = await testCommand(4, "subscribe repo-Z")
       expect(response.text).toEqual(
         `subscribed:${config.github_organization}/repo-Z`
       )
-      expect(database.getRepositoriesByChat(basecampChatUrl(4))).toEqual([
+      expect(await database.getRepositoriesByChat(basecampChatUrl(4))).toEqual([
         "repo-Z",
       ])
     })
@@ -113,28 +116,28 @@ describe("POST /command", () => {
 
   describe("unsubscribe", () => {
     it("should successfully remove database entry", async () => {
-      expect(database.getRepositoriesByChat(basecampChatUrl(1))).toContain(
-        "repo-B"
-      )
+      expect(
+        await database.getRepositoriesByChat(basecampChatUrl(1))
+      ).toContain("repo-B")
       const response = await testCommand(1, "unsubscribe repo-B")
       expect(response.text).toEqual(
         `unsubscribed:${config.github_organization}/repo-B`
       )
-      expect(database.getRepositoriesByChat(basecampChatUrl(1))).not.toContain(
-        "repo-B"
-      )
+      expect(
+        await database.getRepositoriesByChat(basecampChatUrl(1))
+      ).not.toContain("repo-B")
     })
 
     it("should return the prepared message when the repository is not subscribed to", async () => {
-      expect(database.getRepositoriesByChat(basecampChatUrl(0))).not.toContain(
-        "repo-B"
-      )
+      expect(
+        await database.getRepositoriesByChat(basecampChatUrl(0))
+      ).not.toContain("repo-B")
       const response = await testCommand(0, "unsubscribe repo-B")
       expectMention(response.text)
       expect(response.text).toContain("unsubscribe_fail")
-      expect(database.getRepositoriesByChat(basecampChatUrl(0))).not.toContain(
-        "repo-B"
-      )
+      expect(
+        await database.getRepositoriesByChat(basecampChatUrl(0))
+      ).not.toContain("repo-B")
     })
   })
 })

@@ -14,9 +14,8 @@
     "rules": {
         "semi": "off",
         "@typescript-eslint/indent": "off",
-        "@typescript-eslint/member-delimiter-style": "none",
+        "@typescript-eslint/member-delimiter-style": 0,
         "@typescript-eslint/no-namespace": "off",
-        "@typescript-eslint/camelcase": "warn",
         "@typescript-eslint/no-parameter-properties": "off"
     }
 }

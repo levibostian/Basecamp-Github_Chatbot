@@ -40,7 +40,7 @@ Using [ejs](https://ejs.co/) templates, the repository notification messages can
 
 ## Installation
 ### Requirements
-* A public-facing server with [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/install/), and [Node.js](https://nodejs.org/en/) installed to be able to build the Docker image. 
+* A Kubernetes cluster or a public-facing server with [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/install/), and [Node.js](https://nodejs.org/en/) installed to be able to build the Docker image
 * Basecamp 3
 * GitHub organization
 * Admin rights on both Basecamp and Github (setup only)
@@ -51,12 +51,15 @@ Copy `.env.example` to `.env`. Set the following keys appropriately:
 
 | Key | Value | Example |
 | --- | --- | --- |
-| `SERVER_PORT` | the port to run the server on | 3000 (default) |
+| `SERVER_PORT` | the port to run the server on | 3000 |
 | `BASECAMP_ACCESS_KEY` | an access key of your choice to prevent abuse | (see below) | 
 | `BASECAMP_USER_AGENT` | user agent to use when making requests to the Basecamp API <sup>[[note]](https://github.com/basecamp/bc3-api#identifying-your-application)</sup> | Your-Org-Bot (your-email@example.org) |
 | `GITHUB_HMAC_SECRET` | 20 character hex key also provided to GitHub | (see below) |
 | `GITHUB_ORGANIZATION` | GitHub organization name | your-github-org-name |
 | `DATA_DIRECTORY` | Where to store database and logs. Default `.`. | `data` |
+| `DATABASE_CONFIGMAP` | The name of the Kubernetes ConfigMap in which the JSON database will be stored. (optional) | `basecamp-github-chatbot` |
+| `DATABASE_FILE` | The path to the JSON database file. (optional) | `database.json` (default) |
+| `TEMPLATE_FILE` | The path to the JSON template definitions. (optional) | `templates.json` (default) |
 
 Here are some good ways to generate your HMAC secret and access key: 
 ```
@@ -68,7 +71,7 @@ $ hexdump -n 20 -e '20/1 "%02x" 1 "\n"' /dev/urandom
 ```
 
 #### Deployment
-You have 2 choices on how to run the application: Docker (recommended and tested), or Node.js.
+You have 3 choices on how to run the application: Docker (recommended and tested), Kubernetes, or Node.js.
 
 ##### Docker
 If you would like to run your server in a Docker container, you only need `.env`, and optionally `docker-compose.yml`.
@@ -79,8 +82,6 @@ See the relevant comment in the `volumes` section of `docker-compose.yml` for he
 
 ```
 $ docker-compose -f docker-compose.yml up
-# or
-$ docker-compose -f docker-compose.yml up -d   # detached
 ```
 
 To run without Docker Compose, use a command similar to the following:
@@ -89,13 +90,21 @@ To run without Docker Compose, use a command similar to the following:
 $ docker run --env-file=.env -p 3000:3000 -v $(pwd)/error.log:/home/app/error.log -v $(pwd)/database.json:/home/app/database.json foundersclubsoftware/basecamp-github-chatbot:latest
 ```
 
+##### Kubernetes
+Make sure your `kubectl` context is set to the desired namespace. Create a secret from your `.env`:
+```
+$ kubectl create secret generic basecamp-github-chatbot-env --from-file=.env=.env
+```
+
+Review the contents of `k8s/app.yaml`, modify as needed, then deploy with `kubectl apply -f k8s`.
+
 ##### Node.js
 If you plan to run Node directly on your server and not use Docker, simply build and run on your server after setting your environment variables:
 
 ```
 $ npm install 
-$ npm run _build
-$ npm run _production:run
+$ npm run build
+$ npm run run
 ```
 
 Errors are logged to `error.log` when running in production, and the database is stored in `database.json`.

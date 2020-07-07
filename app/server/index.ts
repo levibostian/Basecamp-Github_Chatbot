@@ -19,11 +19,9 @@ server.post(
 server.post("/command", express.json(), ChatCommand)
 
 /* Send same response for all endpoints */
-server.use(
-  (req, res, next): void => {
-    res.status(204).send()
-    next()
-  }
-)
+server.use((req, res, next): void => {
+  res.status(204).send()
+  next()
+})
 
 export default server

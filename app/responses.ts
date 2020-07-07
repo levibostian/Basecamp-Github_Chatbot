@@ -27,7 +27,10 @@ export const responses: {
   },
 }
 
-export function sendResponse(res: Response, serverResponse: ServerResponse) {
+export function sendResponse(
+  res: Response,
+  serverResponse: ServerResponse
+): void {
   res.status(serverResponse.code)
   if (serverResponse.message) {
     res.send({ message: serverResponse.message })

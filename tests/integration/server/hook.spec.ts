@@ -14,7 +14,8 @@ jest.mock("@app/config", () => ({
   basecamp_user_agent: "test-ua",
   github_organization: "test-org",
   github_hmac_secret: "abcde00000000000000000000000000000000000",
-  data_directory: "tests/data",
+  template_file: "tests/data/templates.json",
+  database_file: "tests/data/database.json",
 }))
 
 function testPayload(
@@ -99,7 +100,7 @@ describe("POST /hook", () => {
       )
 
       expect(axiosMock.history.post).toHaveLength(2)
-      axiosMock.history.post.forEach(p => {
+      axiosMock.history.post.forEach((p) => {
         expect(JSON.parse(p.data).content).toEqual("test_event_0")
       })
     })
@@ -154,8 +155,8 @@ describe("POST /hook", () => {
 
   describe("handled events", () => {
     it("should rename repositories in the database", async () => {
-      expect(database.getChatsByRepository("repo-A")).toHaveLength(1)
-      expect(database.getChatsByRepository("repo-A-new")).toHaveLength(0)
+      expect(await database.getChatsByRepository("repo-A")).toHaveLength(1)
+      expect(await database.getChatsByRepository("repo-A-new")).toHaveLength(0)
 
       const payload = {
         action: "renamed",
@@ -165,14 +166,14 @@ describe("POST /hook", () => {
       }
 
       await testPayload("repo-A-new", "repository", payload)
-      expect(database.getChatsByRepository("repo-A")).toHaveLength(0)
-      expect(database.getChatsByRepository("repo-A-new")).toHaveLength(1)
+      expect(await database.getChatsByRepository("repo-A")).toHaveLength(0)
+      expect(await database.getChatsByRepository("repo-A-new")).toHaveLength(1)
     })
 
     it("should delete repositories in the database", async () => {
-      expect(database.getChatsByRepository("repo-A")).toHaveLength(1)
+      expect(await database.getChatsByRepository("repo-A")).toHaveLength(1)
       await testPayload("repo-A", "repository", { action: "deleted" })
-      expect(database.getChatsByRepository("repo-A")).toHaveLength(0)
+      expect(await database.getChatsByRepository("repo-A")).toHaveLength(0)
     })
   })
 })

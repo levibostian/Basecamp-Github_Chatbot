@@ -8,8 +8,8 @@ export const command = "list"
 export const describe = ""
 export const builder = {}
 
-export function handler(context: ChatCommandContext): void {
-  const repositories = db.getRepositoriesByChat(context.chatUrl)
+export async function handler(context: ChatCommandContext): Promise<void> {
+  const repositories = await db.getRepositoriesByChat(context.chatUrl)
   if (repositories.length) {
     context.respond(ejs.render(CommandResponses.list_repos, { repositories }))
   } else {

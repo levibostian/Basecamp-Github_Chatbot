@@ -20,7 +20,10 @@ declare global {
   }
 }
 
-function dispatchMessages(event: string, payload: GithubPayload): void {
+async function dispatchMessages(
+  event: string,
+  payload: GithubPayload
+): Promise<void> {
   const repo = (payload.repository || {}).name
   if (!repo) {
     return
@@ -30,38 +33,35 @@ function dispatchMessages(event: string, payload: GithubPayload): void {
     switch (payload.action) {
       // Change repo name in database if renamed on Github
       case "renamed":
-        db.renameRepository(payload.changes.repository.name.from, repo)
+        await db.renameRepository(payload.changes.repository.name.from, repo)
         break
       // Remove repo name from database if deleted on GitHub
       case "deleted":
-        db.deleteRepository(repo)
+        await db.deleteRepository(repo)
         break
     }
   }
 
   const message = TranslateGithubPayload(event, payload)
-  db.getChatsByRepository(repo).forEach(
-    (chatUrl): void => {
-      axios
-        .post(
-          chatUrl,
-          { content: message },
-          { headers: { "User-Agent": config.basecamp_user_agent } }
+  const chats = await db.getChatsByRepository(repo)
+  chats.forEach((chatUrl): void => {
+    axios
+      .post(
+        chatUrl,
+        { content: message },
+        { headers: { "User-Agent": config.basecamp_user_agent } }
+      )
+      .catch((err): void => {
+        throw Error(
+          `Failed to POST ${message} to ${chatUrl}\n${err}\n${err.stack}`
         )
-        .catch(
-          (err): void => {
-            throw Error(
-              `Failed to POST ${message} to ${chatUrl}\n${err}\n${err.stack}`
-            )
-          }
-        )
-    }
-  )
+      })
+  })
 }
 
 export function VerifyGithubHMAC(
   req: Request,
-  res: Response,
+  _res: Response,
   buf: Buffer,
   encoding: string
 ): void {
@@ -78,11 +78,11 @@ export function VerifyGithubHMAC(
   req.hmacVerified = signature === senderSignature
 }
 
-export function GithubWebhook(
+export async function GithubWebhook(
   req: Request,
   res: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   // Ensure the request came from Github
   if (!req.hmacVerified) {
     sendResponse(res, responses.empty)
@@ -107,16 +107,15 @@ export function GithubWebhook(
   }
 
   try {
-    dispatchMessages(event, req.body)
+    await dispatchMessages(event, req.body)
     sendResponse(res, responses.event_handled)
   } catch (err) {
     if (err instanceof TranslationError) {
       sendResponse(res, responses.translation_error)
+      console.log(err.message)
     } else {
       sendResponse(res, responses.basecamp_post_failed)
+      return next(err)
     }
-    return next(err)
   }
-
-  next()
 }

@@ -1,16 +1,7 @@
 import ejs from "ejs"
 import fs from "fs"
-import path from "path"
 
 import config from "@app/config"
-
-const TEMPLATE_FILE = "templates.json"
-const defaultPath = TEMPLATE_FILE
-const userTemplatePath = path.join(config.data_directory, TEMPLATE_FILE)
-
-const templatePath = fs.existsSync(userTemplatePath)
-  ? userTemplatePath
-  : defaultPath
 
 const templates: {
   notifications: {
@@ -28,12 +19,13 @@ const templates: {
     unsubscribe: string
     unsubscribe_fail: string
   }
-} = JSON.parse(fs.readFileSync(templatePath).toString())
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+} = JSON.parse(fs.readFileSync(config.template_file).toString())
 
 export const CommandResponses = templates.responses
 
 export interface GithubPayload {
-  [key: string]: any
+  [key: string]: unknown
 
   action: string
   repository: {
@@ -47,7 +39,7 @@ export function TranslateGithubPayload(
   event: string,
   payload: GithubPayload
 ): string {
-  const translation = templates.notifications[event]
+  const translation = templates.notifications[`${event}`]
 
   if (!translation) {
     throw new TranslationError(
@@ -69,9 +61,9 @@ export function TranslateGithubPayload(
   // Construct templates
   const eventTemplates: { [key: string]: string } = {}
   Object.entries(translation.templates).forEach(([key, value]) => {
-    eventTemplates[key] = ejs.render(value, payload)
+    eventTemplates[`${key}`] = ejs.render(value, payload)
   })
 
-  const targetTemplate: string = translation.actions[eventAction]
+  const targetTemplate: string = translation.actions[`${eventAction}`]
   return ejs.render(targetTemplate, { ...payload, ...eventTemplates })
 }

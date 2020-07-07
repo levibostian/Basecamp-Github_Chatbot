@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  app:
+    image: basecamp-github-chatbot:devel
+    build:
+      context: ../..
+      dockerfile: docker/development/Dockerfile
+
+    ports:
+    - '${SERVER_PORT}:${SERVER_PORT}'
+    volumes:
+    - ../..:/home/app/app

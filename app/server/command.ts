@@ -31,6 +31,4 @@ export async function ChatCommand(
   } catch (err) {
     return next(err)
   }
-
-  next()
 }

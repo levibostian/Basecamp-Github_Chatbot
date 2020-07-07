@@ -5,23 +5,23 @@ jest.mock("@app/config", () => ({
 }))
 
 class MockStorageEngine implements StorageEngine {
-  public write: (chats: Chat[]) => void
-  public read: () => Chat[]
+  public write: (chats: Chat[]) => Promise<void>
+  public read: () => Promise<Chat[]>
 
   public constructor(chats?: Chat[]) {
     this.write = jest.fn()
-    this.read = jest.fn().mockReturnValue(chats ? chats : [])
+    this.read = jest.fn().mockResolvedValue(chats ? chats : [])
   }
 }
 
 describe("ChatStore", () => {
   describe("getRepositoriesByChat()", () => {
-    it("return an empty list for no matches", () => {
+    it("return an empty list for no matches", async () => {
       const store = new ChatStore(new MockStorageEngine())
-      expect(store.getRepositoriesByChat("test-chat")).toEqual([])
+      expect(await store.getRepositoriesByChat("test-chat")).toEqual([])
     })
 
-    it("should return the full list of repositories for the given chat", () => {
+    it("should return the full list of repositories for the given chat", async () => {
       const chat = "test-chat"
       const repos = ["A", "B", "C"]
 
@@ -33,17 +33,17 @@ describe("ChatStore", () => {
       ]
 
       const store = new ChatStore(new MockStorageEngine(db))
-      expect(store.getRepositoriesByChat(chat)).toEqual(repos)
+      expect(await store.getRepositoriesByChat(chat)).toEqual(repos)
     })
   })
 
   describe("getChatsByRepository()", () => {
-    it("should return an empty list for no matches", () => {
+    it("should return an empty list for no matches", async () => {
       const store = new ChatStore(new MockStorageEngine())
-      expect(store.getChatsByRepository("test-repo")).toEqual([])
+      expect(await store.getChatsByRepository("test-repo")).toEqual([])
     })
 
-    it("should return all chats that contain the repository", () => {
+    it("should return all chats that contain the repository", async () => {
       const db = [
         { chat_url: "A", repositories: ["1", "2", "3"] },
         { chat_url: "B", repositories: ["1", "3"] },
@@ -51,12 +51,12 @@ describe("ChatStore", () => {
       ]
 
       const store = new ChatStore(new MockStorageEngine(db))
-      expect(store.getChatsByRepository("2").sort()).toEqual(["A", "C"])
+      expect((await store.getChatsByRepository("2")).sort()).toEqual(["A", "C"])
     })
   })
 
   describe("renameRepository()", () => {
-    it("should rename all occurrences of the target", () => {
+    it("should rename all occurrences of the target", async () => {
       const db = [
         { chat_url: "A", repositories: ["1", "2", "3"] },
         { chat_url: "B", repositories: ["1", "3"] },
@@ -65,34 +65,34 @@ describe("ChatStore", () => {
 
       const storageEngine = new MockStorageEngine(db)
       const store = new ChatStore(storageEngine)
-      expect(store.getChatsByRepository("3").sort()).toEqual(["A", "B"])
-      expect(store.getChatsByRepository("4")).toEqual([])
+      expect((await store.getChatsByRepository("3")).sort()).toEqual(["A", "B"])
+      expect(await store.getChatsByRepository("4")).toEqual([])
 
-      store.renameRepository("3", "4")
+      await store.renameRepository("3", "4")
       expect(storageEngine.write).toHaveBeenCalled()
-      expect(store.getChatsByRepository("3")).toEqual([])
-      expect(store.getChatsByRepository("4").sort()).toEqual(["A", "B"])
+      expect(await store.getChatsByRepository("3")).toEqual([])
+      expect((await store.getChatsByRepository("4")).sort()).toEqual(["A", "B"])
     })
   })
 
   describe("addRepositoryToChat()", () => {
-    it("should create a new entry if it does not exist already", () => {
+    it("should create a new entry if it does not exist already", async () => {
       const chat = "test-chat"
       const repo = "test-repo"
 
       const storageEngine = new MockStorageEngine()
       const store = new ChatStore(storageEngine)
 
-      expect(store.getRepositoriesByChat(chat)).toHaveLength(0)
-      store.addRepositoryToChat(repo, chat)
+      expect(await store.getRepositoriesByChat(chat)).toHaveLength(0)
+      await store.addRepositoryToChat(repo, chat)
       expect(storageEngine.write).toHaveBeenCalled()
 
-      let chatRepos = store.getRepositoriesByChat(chat)
+      let chatRepos = await store.getRepositoriesByChat(chat)
       expect(chatRepos.length).toEqual(1)
       expect(chatRepos).toContain(repo)
     })
 
-    it("should add to existing entries", () => {
+    it("should add to existing entries", async () => {
       const chat = "test-chat"
       const repos = ["A", "B", "C"]
 
@@ -104,10 +104,10 @@ describe("ChatStore", () => {
       ]
       const storageEngine = new MockStorageEngine(db)
       const store = new ChatStore(storageEngine)
-      store.addRepositoryToChat(repos[2], chat)
+      await store.addRepositoryToChat(repos[2], chat)
       expect(storageEngine.write).toHaveBeenCalled()
 
-      let chatRepos = store.getRepositoriesByChat(chat)
+      let chatRepos = await store.getRepositoriesByChat(chat)
       expect(chatRepos.length).toEqual(3)
       expect(chatRepos).toEqual(repos)
     })
@@ -116,10 +116,10 @@ describe("ChatStore", () => {
   describe("removeRepositoriesFromChat()", () => {
     it("should do nothing if chat does not exist", () => {
       const store = new ChatStore(new MockStorageEngine())
-      expect(() => store.removeRepositoryFromChat("repo", "chat")).not.toThrow()
+      return store.removeRepositoryFromChat("repo", "chat")
     })
 
-    it("should do nothing if chat isn't subscribed to repo", () => {
+    it("should do nothing if chat isn't subscribed to repo", async () => {
       const db = [
         {
           chat_url: "chat",
@@ -128,11 +128,11 @@ describe("ChatStore", () => {
       ]
       const store = new ChatStore(new MockStorageEngine(db))
 
-      store.removeRepositoryFromChat("B", "chat")
-      expect(store.getRepositoriesByChat("chat")).toEqual(["A"])
+      await store.removeRepositoryFromChat("B", "chat")
+      expect(await store.getRepositoriesByChat("chat")).toEqual(["A"])
     })
 
-    it("should remove repository from subscribed chat", () => {
+    it("should remove repository from subscribed chat", async () => {
       const db = [
         {
           chat_url: "chat",
@@ -142,14 +142,17 @@ describe("ChatStore", () => {
       const storageEngine = new MockStorageEngine(db)
       const store = new ChatStore(storageEngine)
 
-      store.removeRepositoryFromChat("B", "chat")
+      await store.removeRepositoryFromChat("B", "chat")
       expect(storageEngine.write).toHaveBeenCalled()
-      expect(store.getRepositoriesByChat("chat").sort()).toEqual(["A", "C"])
+      expect((await store.getRepositoriesByChat("chat")).sort()).toEqual([
+        "A",
+        "C",
+      ])
     })
   })
 
   describe("deleteRepository()", () => {
-    it("should remove all occurrences of the repository", () => {
+    it("should remove all occurrences of the repository", async () => {
       const db = [
         { chat_url: "A", repositories: ["1", "2", "3"] },
         { chat_url: "B", repositories: ["1", "3"] },
@@ -157,11 +160,11 @@ describe("ChatStore", () => {
       ]
       const storageEngine = new MockStorageEngine(db)
       const store = new ChatStore(storageEngine)
-      expect(store.getChatsByRepository("3").sort()).toEqual(["A", "B"])
+      expect((await store.getChatsByRepository("3")).sort()).toEqual(["A", "B"])
 
-      store.deleteRepository("3")
+      await store.deleteRepository("3")
       expect(storageEngine.write).toHaveBeenCalled()
-      expect(store.getChatsByRepository("3")).toEqual([])
+      expect(await store.getChatsByRepository("3")).toEqual([])
     })
   })
 })

@@ -9,11 +9,11 @@ export const command = "unsubscribe <repo>"
 export const describe = ""
 export const builder = {}
 
-export function handler(context: ChatCommandContext): void {
-  const repositories = db.getRepositoriesByChat(context.chatUrl)
+export async function handler(context: ChatCommandContext): Promise<void> {
+  const repositories = await db.getRepositoriesByChat(context.chatUrl)
 
   if (repositories.includes(context.repo)) {
-    db.removeRepositoryFromChat(context.repo, context.chatUrl)
+    await db.removeRepositoryFromChat(context.repo, context.chatUrl)
     context.respond(
       ejs.render(CommandResponses.unsubscribe, {
         repo: context.repo,

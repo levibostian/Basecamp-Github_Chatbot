@@ -4,4 +4,4 @@ RUN mkdir -p /home/app/app
 ENV HOME=/home/app/app
 WORKDIR ${HOME}
 
-CMD npm run _build && npm run _local:run
+CMD npm run-script build && npm run-script run

@@ -10,24 +10,34 @@ const REQUIRED_VARIABLES = [
   "GITHUB_HMAC_SECRET",
 ]
 
-let missingVariables: string[] = []
-REQUIRED_VARIABLES.forEach(variable => {
-  if (!(variable in process.env) || !process.env[variable]) {
+const missingVariables: string[] = []
+REQUIRED_VARIABLES.forEach((variable) => {
+  if (!(variable in process.env) || !process.env[`${variable}`]) {
     missingVariables.push(variable)
   }
 })
 
 if (missingVariables.length) {
   console.log("Missing the following required environment variables:")
-  missingVariables.forEach(variable => console.log(`  - ${variable}`))
+  missingVariables.forEach((variable) => console.log(`  - ${variable}`))
   process.exit(1)
 }
 
 export default {
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
   server_port: process.env.SERVER_PORT!,
   basecamp_access_key: process.env.BASECAMP_ACCESS_KEY!,
   basecamp_user_agent: process.env.BASECAMP_USER_AGENT!,
   github_organization: process.env.GITHUB_ORGANIZATION!,
   github_hmac_secret: process.env.GITHUB_HMAC_SECRET!,
-  data_directory: process.env.DATA_DIRECTORY ? process.env.DATA_DIRECTORY : ".",
+  database_file:
+    "DATABASE_FILE" in process.env
+      ? process.env.DATABASE_FILE!
+      : "database.json",
+  template_file:
+    "TEMPLATE_FILE" in process.env
+      ? process.env.TEMPLATE_FILE!
+      : "templates.json",
+  database_configmap: process.env.DATABASE_CONFIGMAP,
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
 }
